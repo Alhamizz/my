@@ -271,7 +271,7 @@ class App extends Component {
       this.setState({image: e.target.result});
     };
     reader.readAsDataURL(event.target.files[0]);
-    console.log(this.state.finish);
+    console.log(this.state.background[2]);
   };
 
   fileData = () => {
@@ -399,6 +399,16 @@ class App extends Component {
     var i = 0;
     var idx = items ;
 
+    console.log(this.state.background);
+
+    console.log(this.state.head);
+    console.log(this.state.eyes);
+    console.log(this.state.eyes.length)
+    console.log(this.state.nose);
+    console.log(this.state.mouth);
+    console.log(this.state.hair);
+    console.log(this.state.beard);
+
     var itemsInput = [
       [ this.state.background ],
       [ this.state.head ],
@@ -509,7 +519,7 @@ class App extends Component {
   async getLayer2(eyesnum, skip=0.0) {
 
     const data2 = await this.state.eyes[eyesnum];
-    const data2name = await data2.name;
+    const data2name = data2.name;
     this.setState({data2name});
 
     const reader = new FileReader();
@@ -619,9 +629,9 @@ class App extends Component {
   async generateRandomImages() {
     //const backgroundResult = await this.randInt(this.state.backgroundLength);
     //const headResult = await this.randInt(this.state.headLength);
-    const eyesResult = await this.getLayer2(await this.randInt(await this.state.eyesLength));
-    const noseResult = await this.getLayer3(await this.randInt(await this.state.noseLength));
-    const mouthResult = await this.getLayer4(await this.randInt(await this.state.mouthLength));
+    const eyesResult = await this.getLayer2(await this.randInt(await this.state.eyes.length));
+    const noseResult = await this.getLayer3(await this.randInt(await this.state.nose.length));
+    const mouthResult = await this.getLayer4(await this.randInt(await this.state.mouth.length));
     //const hairResult = await this.randInt(this.state.hairLength);
     //const beardResult = await this.randInt(this.state.beardLength);
 
@@ -788,36 +798,50 @@ class App extends Component {
   async addFields(){
     // Generate a dynamic number of inputs
     var number = document.getElementById("Layers").value;
+    this.setState({number});
     // Get the element where the inputs will be added to
     var container = document.getElementById("container");
-
-    var layer = [];
-    var layerLength = [];
-
+    var x = 0;
+    var value = 0;
+    var valuelength = 0;
+    
     const inputLayer = event => {
 
-      layer[i]= [];
-      layerLength[i] = event.target.files.length;
-      this.setState({layerLength});
+      if(x === 0){
+        value = this.state.background;
+      };
+      if(x === 1){
+        value = this.state.head;
+      };
+      if(x === 2){
+        value = this.state.eyes;
+      };
+      if(x === 3){
+        value = this.state.nose;
+      };
+      if(x === 4){
+        value = this.state.mouth;
+      };
+      if(x === 5){
+        value = this.state.hair;
+      };
+      if(x === 6){
+        value = this.state.beard;
+      };
 
-      console.log(layerLength[0]);
-      console.log(this.state.layerLength[1]);
-      console.log(layerLength[2]);
-  
       for (var m = 0; m < event.target.files.length ; m++){
-        layer[i] = event.target.files[m];
-        console.log(layer[i]);
+        value[m] = event.target.files[m];
       }
+      x++;
     }
 
- 
     // Remove every children it had before
     while (container.hasChildNodes()) {
         container.removeChild(container.lastChild);
     }
 
     for (var i = 0; i <number; i++){
-
+ 
       container.appendChild(document.createTextNode("Layer " + (i+1)));
 
       var form = document.createElement("form");

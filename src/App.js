@@ -1580,7 +1580,7 @@ class App extends Component {
       var url4  = window.URL.createObjectURL(blob4);
       var blob5 = new Blob([await this.state.hair[hairResult]]);
       var url5  = window.URL.createObjectURL(blob5);
-      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var blob6 = new Blob([await this.state.beard[beardResult]]);
       var url6  = window.URL.createObjectURL(blob6);
 
       const  backgroundIm = await loadImage(url0);
@@ -1644,9 +1644,9 @@ class App extends Component {
       var url4  = window.URL.createObjectURL(blob4);
       var blob5 = new Blob([await this.state.hair[hairResult]]);
       var url5  = window.URL.createObjectURL(blob5);
-      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var blob6 = new Blob([await this.state.beard[beardResult]]);
       var url6  = window.URL.createObjectURL(blob6);
-      var blob7 = new Blob([await this.state.hair[layer7Result]]);
+      var blob7 = new Blob([await this.state.layer7items[layer7Result]]);
       var url7  = window.URL.createObjectURL(blob7);
 
       const  backgroundIm = await loadImage(url0);
@@ -1715,11 +1715,11 @@ class App extends Component {
       var url4  = window.URL.createObjectURL(blob4);
       var blob5 = new Blob([await this.state.hair[hairResult]]);
       var url5  = window.URL.createObjectURL(blob5);
-      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var blob6 = new Blob([await this.state.beard[beardResult]]);
       var url6  = window.URL.createObjectURL(blob6);
-      var blob7 = new Blob([await this.state.hair[layer7Result]]);
+      var blob7 = new Blob([await this.state.layer7items[layer7Result]]);
       var url7  = window.URL.createObjectURL(blob7);
-      var blob8 = new Blob([await this.state.hair[layer8Result]]);
+      var blob8 = new Blob([await this.state.layer8items[layer8Result]]);
       var url8  = window.URL.createObjectURL(blob8);
 
       const  backgroundIm = await loadImage(url0);
@@ -1793,13 +1793,13 @@ class App extends Component {
       var url4  = window.URL.createObjectURL(blob4);
       var blob5 = new Blob([await this.state.hair[hairResult]]);
       var url5  = window.URL.createObjectURL(blob5);
-      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var blob6 = new Blob([await this.state.bearditems[beardResult]]);
       var url6  = window.URL.createObjectURL(blob6);
-      var blob7 = new Blob([await this.state.hair[layer7Result]]);
+      var blob7 = new Blob([await this.state.layer7items[layer7Result]]);
       var url7  = window.URL.createObjectURL(blob7);
-      var blob8 = new Blob([await this.state.hair[layer8Result]]);
+      var blob8 = new Blob([await this.state.layer8items[layer8Result]]);
       var url8  = window.URL.createObjectURL(blob8);
-      var blob9 = new Blob([await this.state.hair[layer9Result]]);
+      var blob9 = new Blob([await this.state.layer9items[layer9Result]]);
       var url9  = window.URL.createObjectURL(blob9);
 
       const  backgroundIm = await loadImage(url0);

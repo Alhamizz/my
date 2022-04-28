@@ -3,10 +3,6 @@ import { Tabs, Tab } from 'react-bootstrap';
 import React, {Component } from "react";
 import './App.css';
 
-function getBase64String(dataURL) {
-  var idx = dataURL.indexOf('base64,') + 'base64,'.length;
-  return dataURL.substring(idx);
-}
 
 function timeout(delay) {
   
@@ -111,6 +107,12 @@ function downloadPNG(name, png) {
   link.click();
   link.remove();
 }
+
+function getBase64String(dataURL) {
+  var idx = dataURL.indexOf('base64,') + 'base64,'.length;
+  return dataURL.substring(idx);
+}
+
 
 class App extends Component {
   
@@ -262,95 +264,6 @@ class App extends Component {
   
 // MENU 3 NFT FACTORY
 
-  inputLayer = event => {
-    var layer = [];
-    var layerLength = [];
-    layer[this.state.i]= [];
-    layerLength[this.state.i] = event.target.files.length;
-    this.setState({layerLength});
-
-    for (var i = 0; i < event.target.files.length ; i++){
-      layer[i] = event.target.files[i];
-      this.setState({layer});
-    }
-  }
-
-/*
-  inputBackground = event => {
-    const backgroundLength = event.target.files.length;
-    this.setState({backgroundLength});
-
-    for (var i = 0; i < event.target.files.length ; i++){
-      this.state.background[i] = event.target.files[i];
- 
-    }
-    //console.log(this.state.background[4]);
-    //console.log(this.state.background[5]);
-  };
-
-  inputHead = event => {
-    const headLength = event.target.files.length;
-    this.setState({headLength});
-
-    for (var i = 0; i < event.target.files.length; i++){
-      this.state.head[i] = event.target.files[i];
-    }
-    //console.log(head[0])
-  };
-
-  inputEyes = event => {
-    const eyesLength = event.target.files.length;
-    this.setState({eyesLength});
-
-    for (var i = 0; i < event.target.files.length; i++){
-      this.state.eyes[i] = event.target.files[i];
-    }
-    //console.log(eyes[0])
-  };
-
-  inputNose = event => {
-    const noseLength = event.target.files.length;
-    this.setState({noseLength});
-
-    for (var i = 0; i < event.target.files.length; i++){
-      this.state.nose[i] = event.target.files[i];
-
-    }
-    //console.log(nose[0])
-  };
-
-  inputMouth = event => {
-    const mouthLength = event.target.files.length;
-    this.setState({mouthLength});
-
-    for (var i = 0; i < event.target.files.length; i++){
-      this.state.mouth[i] = event.target.files[i];
-
-    }
-    //console.log(mouth[0])
-  };
-
-  inputHair = event => {
-    const hairLength = event.target.files.length;
-    this.setState({hairLength});
-
-    for (var i = 0; i < event.target.files.length; i++){
-      this.state.hair[i] = event.target.files[i];
-    }
-    //console.log(hair[0])
-  };
-
-  inputBeard = event => {
-    const beardLength = event.target.files.length;
-    this.setState({beardLength});
-
-    for (var i = 0; i < event.target.files.length; i++){
-      this.state.beard[i] = event.target.files[i];
-    }
-    //console.log(beard[0])
-  };
-*/
-
   async generate(prefix, description, url, rarity, items){  
 
     var brd = document.getElementById("board");
@@ -388,8 +301,6 @@ class App extends Component {
     var finish = [];
     this.setState({finish});
 
-    var takenFaces = [].toString();
-    this.setState({takenFaces});
 
     do {
       await this.createImage(idx, prefix, description, url, rarity, items);
@@ -437,7 +348,6 @@ class App extends Component {
         const randName = await this.randElement(names);
         const name = `${randAdj}-${randName}`;
 
-
         if (takenNames[name] || !name) {
             return this.getRandomName();
         } else {
@@ -449,7 +359,8 @@ class App extends Component {
   async getLayer0(backgroundnum, skip=0.0) {
 
     const data0 = this.state.background[backgroundnum]; 
-    const data0name = data0.name;
+    const data0fullname = data0.name;
+    const data0name = data0fullname.replace('.svg','');
     this.setState({data0name});
 
     const reader = new FileReader();
@@ -466,8 +377,8 @@ class App extends Component {
 
   async getLayer1(headnum, skip=0.0) {
 
-    const data1 = this.state.head[headnum]; 
-    const data1name = data1.name;
+    const data1 = await this.state.head[headnum]; 
+    const data1name = await data1.name.replace('.svg','');
     this.setState({data1name});
 
     const reader = new FileReader();
@@ -484,7 +395,7 @@ class App extends Component {
   async getLayer2(eyesnum, skip=0.0) {
 
     const data2 = await this.state.eyes[eyesnum];
-    const data2name = data2.name;
+    const data2name = await data2.name.replace('.svg','');
     this.setState({data2name});
 
     const reader = new FileReader();
@@ -501,7 +412,7 @@ class App extends Component {
   async getLayer3(nosenum, skip=0.0) {
 
     const data3 = await this.state.nose[nosenum];
-    const data3name = await data3.name;
+    const data3name = await data3.name.replace('.svg','');
     this.setState({data3name});
 
     const reader = new FileReader();
@@ -518,7 +429,7 @@ class App extends Component {
   async getLayer4(mouthnum, skip=0.0) {
 
     const data4 = await this.state.mouth[mouthnum];
-    const data4name = await data4.name;
+    const data4name = await data4.name.replace('.svg','');
     this.setState({data4name});
 
     const reader = new FileReader();
@@ -534,8 +445,8 @@ class App extends Component {
 
   async getLayer5(hairnum, skip=0.0) {
 
-    const data5 = this.state.hair[hairnum];
-    const data5name = data5.name;
+    const data5 = await this.state.hair[hairnum];
+    const data5name = await data5.name.replace('.svg','');
     this.setState({data5name});
 
     const reader = new FileReader();
@@ -551,8 +462,8 @@ class App extends Component {
 
   async getLayer6(beardnum, skip=0.0) {
 
-    const data6 = this.state.beard[beardnum]; 
-    const data6name = data6.name;
+    const data6 = await this.state.beard[beardnum]; 
+    const data6name = await data6.name.replace('.svg','');
     this.setState({data6name});
 
     const reader = new FileReader();
@@ -568,8 +479,8 @@ class App extends Component {
 
   async getLayer7(layer7itemsnum, skip=0.0) {
 
-    const data7 = this.state.layer7items[layer7itemsnum]; 
-    const data7name = data7.name;
+    const data7 = await this.state.layer7items[layer7itemsnum]; 
+    const data7name = await data7.name.replace('.svg','');
     this.setState({data7name});
 
     const reader = new FileReader();
@@ -585,8 +496,8 @@ class App extends Component {
 
   async getLayer8(layer8itemsnum, skip=0.0) {
 
-    const data8 = this.state.layer8items[layer8itemsnum]; 
-    const data8name = data8.name;
+    const data8 = await this.state.layer8items[layer8itemsnum]; 
+    const data8name = await data8.name.replace('.svg','');
     this.setState({data8name});
 
     const reader = new FileReader();
@@ -603,7 +514,7 @@ class App extends Component {
   async getLayer9(layer9itemsnum, skip=0.0) {
 
     const data9 = this.state.layer9items[layer9itemsnum]; 
-    const data9name = data9.name;
+    const data9name = await data9.name.replace('.svg','');
     this.setState({data9name});
 
     const reader = new FileReader();
@@ -1005,9 +916,8 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           }         
         ]
       } 
@@ -1023,14 +933,12 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           }
         ]
       } 
@@ -1046,19 +954,16 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer3",
+            trait_type: this.state.layerName[4],
             value: await this.state.data3name,
-            rarity: `${rarity}`
           }
         ]
       } 
@@ -1074,24 +979,20 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer3",
+            trait_type: this.state.layerName[4],
             value: await this.state.data3name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer4",
+            trait_type: this.state.layerName[5],
             value: await this.state.data4name,
-            rarity: `${rarity}`
           }
         ]
       } 
@@ -1107,29 +1008,24 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer3",
+            trait_type: this.state.layerName[4],
             value: await this.state.data3name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer4",
+            trait_type: this.state.layerName[5],
             value: await this.state.data4name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer5",
+            trait_type: this.state.layerName[6],
             value: await this.state.data5name,
-            rarity: `${rarity}`
           }
         ]
       } 
@@ -1145,34 +1041,28 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer3",
+            trait_type: this.state.layerName[4],
             value: await this.state.data3name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer4",
+            trait_type: this.state.layerName[5],
             value: await this.state.data4name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer5",
+            trait_type: this.state.layerName[6],
             value: await this.state.data5name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer6",
+            trait_type: this.state.layerName[7],
             value: await this.state.data6name,
-            rarity: `${rarity}`
           }
         ]
       } 
@@ -1188,39 +1078,32 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer3",
+            trait_type: this.state.layerName[4],
             value: await this.state.data3name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer4",
+            trait_type: this.state.layerName[5],
             value: await this.state.data4name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer5",
+            trait_type: this.state.layerName[6],
             value: await this.state.data5name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer6",
+            trait_type: this.state.layerName[7],
             value: await this.state.data6name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer7",
+            trait_type: this.state.layerName[8],
             value: await this.state.data7name,
-            rarity: `${rarity}`
           },
         ]
       } 
@@ -1236,43 +1119,35 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer3",
+            trait_type: this.state.layerName[4],
             value: await this.state.data3name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer4",
+            trait_type: this.state.layerName[5],
             value: await this.state.data4name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer5",
+            trait_type: this.state.layerName[6],
             value: await this.state.data5name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer6",
+            trait_type: this.state.layerName[7],
             value: await this.state.data6name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer7",
+            trait_type: this.state.layerName[8],
             value: await this.state.data7name,
-            rarity: `${rarity}`
           },          { 
-            trait_type: "Layer8",
+            trait_type: this.state.layerName[9],
             value: await this.state.data8name,
-            rarity: `${rarity}`
           }
         ]
       } 
@@ -1288,49 +1163,40 @@ class App extends Component {
         attributes: [
     
           { 
-            trait_type: "Layer1",
+            trait_type: this.state.layerName[2],
             value: await this.state.data1name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer2",
+            trait_type: this.state.layerName[3],
             value: await this.state.data2name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer3",
+            trait_type: this.state.layerName[4],
             value: await this.state.data3name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer4",
+            trait_type: this.state.layerName[5],
             value: await this.state.data4name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer5",
+            trait_type: this.state.layerName[6],
             value: await this.state.data5name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer6",
+            trait_type: this.state.layerName[7],
             value: await this.state.data6name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer7",
+            trait_type: this.state.layerName[8],
             value: await this.state.data7name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer8",
+            trait_type: this.state.layerName[9],
             value: await this.state.data8name,
-            rarity: `${rarity}`
           },
           { 
-            trait_type: "Layer9",
+            trait_type: this.state.layerName[10],
             value: await this.state.data9name,
-            rarity: `${rarity}`
           }
         ]
       } 
@@ -1348,7 +1214,7 @@ class App extends Component {
         var png = [];
 
         png = canvas.toDataURL().toString();
-        this.setState({png});
+        //this.setState({png});
         this.state.png.push(png) ;
       };
 
@@ -1360,11 +1226,11 @@ class App extends Component {
 
     if(idx < items && idx > 0){
       //await this.downloadFile(`${idx}.svg`, final)
-      await downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
+      downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
     }
 
     if(idx < (items - 1)){
-      await downloadPNG(`${idx + 1}.png`, this.state.png)
+      //downloadPNG(`${idx + 1}.png`, this.state.png)
     }      
   } 
 
@@ -1396,46 +1262,104 @@ class App extends Component {
     this.setState({number});
     // Get the element where the inputs will be added to
     var container = document.getElementById("container");
-    var x = 0;
-    var value = 0;
+    var x = 1;
+    var y = 0;
+    var value = 0; 
+    var layerName = [];
     
-    const inputLayer = event => {
+    const inputLayerName = event => {
 
-      if(x === 0){
-        value = this.state.background;
-      };
       if(x === 1){
-        value = this.state.head;
+        value = this.state.background;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 2){
-        value = this.state.eyes;
+        value = this.state.head;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 3){
-        value = this.state.nose;
+        value = this.state.eyes;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 4){
-        value = this.state.mouth;
+        value = this.state.nose;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 5){
-        value = this.state.hair;
+        value = this.state.mouth;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 6){
-        value = this.state.beard;
+        value = this.state.hair;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 7){
-        value = this.state.layer7items;
+        value = this.state.beard;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 8){
-        value = this.state.layer8items;
+        value = this.state.layer7items;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
       };
       if(x === 9){
+        value = this.state.layer8items;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
+      };
+      if(x === 10){
+        value = this.state.layer9items;
+        layerName[x] = event.target.value;
+        this.setState({layerName});
+      };
+
+      x++;
+    }
+
+    const inputLayer = event => {
+
+      if(y === 0){
+        value = this.state.background;
+      };
+      if(y === 1){
+        value = this.state.head;
+      };
+      if(y === 2){
+        value = this.state.eyes;
+      };
+      if(y === 3){
+        value = this.state.nose;
+      };
+      if(y === 4){
+        value = this.state.mouth;
+      };
+      if(y === 5){
+        value = this.state.hair;
+      };
+      if(y === 6){
+        value = this.state.beard;
+      };
+      if(y === 7){
+        value = this.state.layer7items;
+      };
+      if(y === 8){
+        value = this.state.layer8items;
+      };
+      if(y === 9){
         value = this.state.layer9items;
       };
 
       for (var m = 0; m < event.target.files.length ; m++){
         value[m] = event.target.files[m];
       }
-      x++;
+      y++;
     }
 
     // Remove every children it had before
@@ -1455,10 +1379,22 @@ class App extends Component {
 
       input.id = 'Layer' + i;
       input.name = 'layer' + i;
+      input.type = 'text';
+      input.placeholder = 'Enter Layer Name..'
+      input.className = "form-control form-control-md"; 
+      input.onchange = inputLayerName;
+
+      container.appendChild(input);     
+
+      var input = document.createElement("input");
+
+      input.id = 'Layer' + i;
+      input.name = 'layer' + i;
       input.type = 'file';
       input.multiple ='multiple';
       input.className = "form-control form-control-md"; 
       input.onchange = inputLayer;
+
 
       container.appendChild(input); 
       container.appendChild(form); 
@@ -1493,10 +1429,6 @@ class App extends Component {
       layer8: 'undefined',
       layer9: 'undefined',
 
-      layerLength: [],
-      imgData: [],
-      takenFaces: [],
-
       background: [],
       head: [],
       eyes: [],
@@ -1508,7 +1440,7 @@ class App extends Component {
       layer8items: [],
       layer9items: [],
       
-  
+      layerName: [],
       itemsInput: [],
       finish: [],
       png: []

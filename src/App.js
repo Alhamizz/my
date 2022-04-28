@@ -3,7 +3,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import React, {Component } from "react";
 import './App.css';
 import mergeImages from 'merge-images';
-
+const { createCanvas, loadImage } = require("canvas");
 
 function timeout(delay) {
   
@@ -340,26 +340,28 @@ class App extends Component {
         await this.createPNG(idx, prefix, description, url, rarity, items);
         await timeout(500); //for 0.5 sec delay
 
-        if ( i === 0 || i === 4 ){
-          i = 1;
-          row = document.createElement("tr");
-          cell = document.createElement("td");
-          cell.innerHTML = `<img src=${this.state.result}  />`;  
-          console.log(this.state.result);
-          row.appendChild(cell);
-          tblBody.appendChild(row);        
-          tbl.appendChild(tblBody);
-          brd.appendChild(tbl);
-  
-        }else {
-          i = i + 1;
-          var cell = document.createElement("td");
-          cell.innerHTML = `<img src=${this.state.result}  />`;
-          row.appendChild(cell);
-          tblBody.appendChild(row);        
-          tbl.appendChild(tblBody);
-          brd.appendChild(tbl);
-        }      
+        if ( idx < items && idx > 0){
+          if ( i === 0 || i === 4 ){
+            i = 1;
+            row = document.createElement("tr");
+            cell = document.createElement("td");
+            cell.innerHTML = `<img src=${this.state.result}  />`;  
+            console.log(this.state.result);
+            row.appendChild(cell);
+            tblBody.appendChild(row);        
+            tbl.appendChild(tblBody);
+            brd.appendChild(tbl);
+    
+          }else {
+            i = i + 1;
+            var cell = document.createElement("td");
+            cell.innerHTML = `<img src=${this.state.result}  />`;
+            row.appendChild(cell);
+            tblBody.appendChild(row);        
+            tbl.appendChild(tblBody);
+            brd.appendChild(tbl);
+          } 
+        }     
       }  
       
  
@@ -1270,105 +1272,341 @@ class App extends Component {
   } 
 
   async createPNG(idx, prefix, description, url, rarity, items) {
+   
+  const  imageFormat = {
+    width: 250,
+    height: 250 
+  };
+
+  const  canvas = createCanvas(imageFormat.width, imageFormat.height);
+  const  ctx = canvas.getContext("2d");
 
     if(this.state.number == 1){
-      const backgroundResult = this.randInt(this.state.background.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+  
+      var blob = new Blob([await this.state.background[backgroundResult]]);
+      var url  = window.URL.createObjectURL(blob);
 
-      const result = mergeImages([this.state.background[backgroundResult]])
-        .then(b64 => document.querySelector('img').src = b64)
-      
-      this.state.result = await result;     
+      const  backgroundIm = await loadImage(await url);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
+
 
     } else if(this.state.number == 2){
-      const backgroundResult = this.randInt(this.state.background.length);
-      const headResult = this.randInt(this.state.head.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
 
-      const result = mergeImages([this.state.background[backgroundResult], this.state.head[headResult]])
-        .then(b64 => document.querySelector('img').src = b64)
-      
-      this.state.result = await result; 
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
 
     } else if(this.state.number == 3){
       const backgroundResult = await this.randInt(this.state.background.length);
       const headResult = await this.randInt(this.state.head.length);
       const eyesResult = await this.randInt(this.state.eyes.length);
-      
-      const result = mergeImages([(this.state.background[backgroundResult]), (this.state.head[headResult]),( this.state.mouth[eyesResult])])
-        .then(b64 => document.querySelector('img').src = b64)
-    
-      this.state.result = await result; 
-      console.log(result)
+
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url1);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
 
 
     } else if(this.state.number == 4){
-      const backgroundResult = this.randInt(this.state.background.length);
-      const headResult = this.randInt(this.state.head.length);
-      const eyesResult = this.randInt(this.state.eyes.length);
-      const noseResult = this.randInt(this.state.nose.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      const noseResult = await this.randInt(this.state.nose.length);
 
-      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult);
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+      var blob3 = new Blob([await this.state.nose[noseResult]]);
+      var url3  = window.URL.createObjectURL(blob3);
 
-      return final;
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url2);
+      const  noseIm = await loadImage(url3);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(noseIm,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
+
     } else if(this.state.number == 5){
-      const backgroundResult = this.randInt(this.state.background.length);
-      const headResult = this.randInt(this.state.head.length);
-      const eyesResult = this.randInt(this.state.eyes.length);
-      const noseResult = this.randInt(this.state.nose.length);
-      const mouthResult = this.randInt(this.state.mouth.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      const noseResult = await this.randInt(this.state.nose.length);
+      const mouthResult = await this.randInt(this.state.mouth.length);
 
-      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult);
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+      var blob3 = new Blob([await this.state.nose[noseResult]]);
+      var url3  = window.URL.createObjectURL(blob3);
+      var blob4 = new Blob([await this.state.mouth[mouthResult]]);
+      var url4  = window.URL.createObjectURL(blob4);
 
-      return final;
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url2);
+      const  noseIm = await loadImage(url3);
+      const  mouthIm = await loadImage(url4);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(noseIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(mouthIm,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
+
     } else if(this.state.number == 6){
-      const backgroundResult =  this.randInt(this.state.background.length);
-      const headResult = this.randInt(this.state.head.length);
-      const eyesResult = this.randInt(this.state.eyes.length);
-      const noseResult = this.randInt(this.state.nose.length);
-      const mouthResult = this.randInt(this.state.mouth.length);
-      const hairResult = this.randInt(this.state.hair.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      const noseResult = await this.randInt(this.state.nose.length);
+      const mouthResult = await this.randInt(this.state.mouth.length);
+      const hairResult = await this.randInt(this.state.hair.length);
 
-      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult);
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+      var blob3 = new Blob([await this.state.nose[noseResult]]);
+      var url3  = window.URL.createObjectURL(blob3);
+      var blob4 = new Blob([await this.state.mouth[mouthResult]]);
+      var url4  = window.URL.createObjectURL(blob4);
+      var blob5 = new Blob([await this.state.hair[hairResult]]);
+      var url5  = window.URL.createObjectURL(blob5);
 
-      return final;
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url2);
+      const  noseIm = await loadImage(url3);
+      const  mouthIm = await loadImage(url4);
+      const  hairIm = await loadImage(url5);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(noseIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(mouthIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(hairIm,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
+
     } else if(this.state.number == 7){
-      const backgroundResult = this.randInt(this.state.background.length);
-      const headResult = this.randInt(this.state.head.length);
-      const eyesResult = this.randInt(this.state.eyes.length);
-      const noseResult = this.randInt(this.state.nose.length);
-      const mouthResult = this.randInt(this.state.mouth.length);
-      const hairResult = this.randInt(this.state.hair.length);
-      const beardResult = this.randInt(this.state.beard.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      const noseResult = await this.randInt(this.state.nose.length);
+      const mouthResult = await this.randInt(this.state.mouth.length);
+      const hairResult = await this.randInt(this.state.hair.length);
+      const beardResult = await this.randInt(this.state.beard.length);
 
-      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult);
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+      var blob3 = new Blob([await this.state.nose[noseResult]]);
+      var url3  = window.URL.createObjectURL(blob3);
+      var blob4 = new Blob([await this.state.mouth[mouthResult]]);
+      var url4  = window.URL.createObjectURL(blob4);
+      var blob5 = new Blob([await this.state.hair[hairResult]]);
+      var url5  = window.URL.createObjectURL(blob5);
+      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var url6  = window.URL.createObjectURL(blob6);
 
-      return final;
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url2);
+      const  noseIm = await loadImage(url3);
+      const  mouthIm = await loadImage(url4);
+      const  hairIm = await loadImage(url5);
+      const  beardIm = await loadImage(url6);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(noseIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(mouthIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(hairIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(beardIm,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
+
     } else if(this.state.number == 8){
-      const backgroundResult = this.randInt(this.state.background.length);
-      const headResult = this.randInt(this.state.head.length);
-      const eyesResult = this.randInt(this.state.eyes.length);
-      const noseResult = this.randInt(this.state.nose.length);
-      const mouthResult = this.randInt(this.state.mouth.length);
-      const hairResult = this.randInt(this.state.hair.length);
-      const beardResult = this.randInt(this.state.beard.length);
-      const layer7Result = this.randInt(this.state.beard.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      const noseResult = await this.randInt(this.state.nose.length);
+      const mouthResult = await this.randInt(this.state.mouth.length);
+      const hairResult = await this.randInt(this.state.hair.length);
+      const beardResult = await this.randInt(this.state.beard.length);
+      const layer7Result = await this.randInt(this.state.layer7items.length);
 
-      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result);
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+      var blob3 = new Blob([await this.state.nose[noseResult]]);
+      var url3  = window.URL.createObjectURL(blob3);
+      var blob4 = new Blob([await this.state.mouth[mouthResult]]);
+      var url4  = window.URL.createObjectURL(blob4);
+      var blob5 = new Blob([await this.state.hair[hairResult]]);
+      var url5  = window.URL.createObjectURL(blob5);
+      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var url6  = window.URL.createObjectURL(blob6);
+      var blob7 = new Blob([await this.state.hair[layer7Result]]);
+      var url7  = window.URL.createObjectURL(blob7);
 
-      return final;
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url2);
+      const  noseIm = await loadImage(url3);
+      const  mouthIm = await loadImage(url4);
+      const  hairIm = await loadImage(url5);
+      const  beardIm = await loadImage(url6);
+      const  layer7Im = await loadImage(url7);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(noseIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(mouthIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(hairIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(beardIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(layer7Im,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
+
     } else if(this.state.number == 9){
-      const backgroundResult = this.randInt(this.state.background.length);
-      const headResult = this.randInt(this.state.head.length);
-      const eyesResult = this.randInt(this.state.eyes.length);
-      const noseResult = this.randInt(this.state.nose.length);
-      const mouthResult = this.randInt(this.state.mouth.length);
-      const hairResult = this.randInt(this.state.hair.length);
-      const beardResult = this.randInt(this.state.beard.length);
-      const layer7Result = this.randInt(this.state.beard.length);
-      const layer8Result = this.randInt(this.state.beard.length);
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      const noseResult = await this.randInt(this.state.nose.length);
+      const mouthResult = await this.randInt(this.state.mouth.length);
+      const hairResult = await this.randInt(this.state.hair.length);
+      const beardResult = await this.randInt(this.state.beard.length);
+      const layer7Result = await this.randInt(this.state.layer7items.length);
+      const layer8Result = await this.randInt(this.state.layer8items.length);
 
-      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result, layer8Result);
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+      var blob3 = new Blob([await this.state.nose[noseResult]]);
+      var url3  = window.URL.createObjectURL(blob3);
+      var blob4 = new Blob([await this.state.mouth[mouthResult]]);
+      var url4  = window.URL.createObjectURL(blob4);
+      var blob5 = new Blob([await this.state.hair[hairResult]]);
+      var url5  = window.URL.createObjectURL(blob5);
+      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var url6  = window.URL.createObjectURL(blob6);
+      var blob7 = new Blob([await this.state.hair[layer7Result]]);
+      var url7  = window.URL.createObjectURL(blob7);
+      var blob8 = new Blob([await this.state.hair[layer8Result]]);
+      var url8  = window.URL.createObjectURL(blob8);
 
-      return final;
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url2);
+      const  noseIm = await loadImage(url3);
+      const  mouthIm = await loadImage(url4);
+      const  hairIm = await loadImage(url5);
+      const  beardIm = await loadImage(url6);
+      const  layer7Im = await loadImage(url7);
+      const  layer8Im = await loadImage(url8);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(noseIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(mouthIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(hairIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(beardIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(layer7Im,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(layer8Im,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
+
     } else if(this.state.number == 10){
       const backgroundResult = await this.randInt(this.state.background.length);
       const headResult = await this.randInt(this.state.head.length);
@@ -1379,11 +1617,56 @@ class App extends Component {
       const beardResult = await this.randInt(this.state.beard.length);
       const layer7Result = await this.randInt(this.state.layer7items.length);
       const layer8Result = await this.randInt(this.state.layer8items.length);
-      const layer9Result =await this.randInt(this.state.layer9items.length);
+      const layer9Result = await this.randInt(this.state.layer9items.length);
 
-      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result, layer8Result, layer9Result);
+      var blob0 = new Blob([await this.state.background[backgroundResult]]);
+      var url0  = window.URL.createObjectURL(blob0);
+      var blob1 = new Blob([await this.state.head[headResult]]);
+      var url1  = window.URL.createObjectURL(blob1);
+      var blob2 = new Blob([await this.state.eyes[eyesResult]]);
+      var url2  = window.URL.createObjectURL(blob2);
+      var blob3 = new Blob([await this.state.nose[noseResult]]);
+      var url3  = window.URL.createObjectURL(blob3);
+      var blob4 = new Blob([await this.state.mouth[mouthResult]]);
+      var url4  = window.URL.createObjectURL(blob4);
+      var blob5 = new Blob([await this.state.hair[hairResult]]);
+      var url5  = window.URL.createObjectURL(blob5);
+      var blob6 = new Blob([await this.state.hair[beardResult]]);
+      var url6  = window.URL.createObjectURL(blob6);
+      var blob7 = new Blob([await this.state.hair[layer7Result]]);
+      var url7  = window.URL.createObjectURL(blob7);
+      var blob8 = new Blob([await this.state.hair[layer8Result]]);
+      var url8  = window.URL.createObjectURL(blob8);
+      var blob9 = new Blob([await this.state.hair[layer9Result]]);
+      var url9  = window.URL.createObjectURL(blob9);
 
-      return final;
+      const  backgroundIm = await loadImage(url0);
+      const  headIm = await loadImage(url1);
+      const  eyesIm = await loadImage(url2);
+      const  noseIm = await loadImage(url3);
+      const  mouthIm = await loadImage(url4);
+      const  hairIm = await loadImage(url5);
+      const  beardIm = await loadImage(url6);
+      const  layer7Im = await loadImage(url7);
+      const  layer8Im = await loadImage(url8);
+      const  layer9Im = await loadImage(url9);
+      ctx.drawImage(backgroundIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(headIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(eyesIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(noseIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(mouthIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(hairIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(beardIm,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(layer7Im,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(layer8Im,0,0,imageFormat.width,imageFormat.height);
+      ctx.drawImage(layer9Im,0,0,imageFormat.width,imageFormat.height);
+
+      var png = [];
+
+      png = canvas.toDataURL();
+
+      const result = png;
+      this.setState({result});
     };
 
     //var newFace = await this.checkImage(rarity);
@@ -1704,11 +1987,11 @@ class App extends Component {
 
     if(idx < items && idx > 0){
       //await this.downloadFile(`${idx}.svg`, final)
-      //downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
+      downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
     }
 
     if(idx < (items - 1)){
-      //downloadPNG(`${idx + 1}.png`, this.state.png)
+      downloadPNG(`${idx + 1}.png`, this.state.result)
     }      
   } 
 

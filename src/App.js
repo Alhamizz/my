@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import { Tabs, Tab } from 'react-bootstrap';
 import React, {Component } from "react";
 import './App.css';
-import mergeImages from 'merge-images';
+
 const { createCanvas, loadImage } = require("canvas");
 
 function timeout(delay) {
@@ -88,6 +88,49 @@ function svgUrlToPng(svgUrl, callback) {
   };
   svgImage.src = svgUrl;
 }
+
+/*function randomGenerator() {
+  // generated a random string
+  newImage = ""
+  for (i = 0, i < layers.length, i++){
+      newImage += String(layers[i].length)
+  }
+
+  return newImage
+}
+
+function generateMetadata()
+{
+  //....
+  return("metadata in json")
+}
+function createImages(rarityAmount, totalImages, allPossibleCombinations) {
+
+  let allImages = [[]] // array inside an array [["item", rarity], ["10111001", 0], ["1000111", 2] ]
+
+  do {
+      newImage = randomGenerator()
+      let existed = false
+      for (i=0, i< allImages.length, i++){
+          if (allImages[i][0] == newImage) {
+              existed = true
+              if (allImages[i][1] < rarityAmount) {
+                  allImages[i][1]++
+                  generateMetadata() // generate metadata for the new one, 
+                  // you can do this while downloading the files, because each of the rare item has a differentnumber
+              }
+              break
+          }
+      }
+
+      if (!existed) {
+          allImages.push([newImage,1]) // the minimum rarity is 1 this way we have all of
+          generateMetadata() // generate metadata
+      }
+
+  } while (allImages.length < totalImages && allImages.length < allPossibleCombinations);
+
+}*/
 
 function downloadFile(name, file) {
   var link = document.createElement("a");
@@ -233,7 +276,7 @@ class App extends Component {
       this.setState({image: e.target.result});
     };
     reader.readAsDataURL(event.target.files[0]);
-    console.log(this.state.background[2]);
+
   };
 
   fileData = () => {
@@ -319,7 +362,7 @@ class App extends Component {
             row = document.createElement("tr");
             cell = document.createElement("td");
             cell.innerHTML = `<img src=${this.state.result}  />`;  
-            console.log(this.state.result);
+            //console.log(this.state.result);
             row.appendChild(cell);
             tblBody.appendChild(row);        
             tbl.appendChild(tblBody);
@@ -346,7 +389,7 @@ class App extends Component {
             row = document.createElement("tr");
             cell = document.createElement("td");
             cell.innerHTML = `<img src=${this.state.result}  />`;  
-            console.log(this.state.result);
+            //console.log(this.state.result);
             row.appendChild(cell);
             tblBody.appendChild(row);        
             tbl.appendChild(tblBody);
@@ -1283,6 +1326,8 @@ class App extends Component {
 
     if(this.state.number == 1){
       const backgroundResult = await this.randInt(this.state.background.length);
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
   
       var blob = new Blob([await this.state.background[backgroundResult]]);
       var url  = window.URL.createObjectURL(blob);
@@ -1301,6 +1346,11 @@ class App extends Component {
     } else if(this.state.number == 2){
       const backgroundResult = await this.randInt(this.state.background.length);
       const headResult = await this.randInt(this.state.head.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1323,6 +1373,13 @@ class App extends Component {
       const backgroundResult = await this.randInt(this.state.background.length);
       const headResult = await this.randInt(this.state.head.length);
       const eyesResult = await this.randInt(this.state.eyes.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1351,6 +1408,15 @@ class App extends Component {
       const headResult = await this.randInt(this.state.head.length);
       const eyesResult = await this.randInt(this.state.eyes.length);
       const noseResult = await this.randInt(this.state.nose.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
+      const data3name = await this.state.nose[noseResult].name.replace('.png','');
+      this.setState({data3name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1383,6 +1449,17 @@ class App extends Component {
       const eyesResult = await this.randInt(this.state.eyes.length);
       const noseResult = await this.randInt(this.state.nose.length);
       const mouthResult = await this.randInt(this.state.mouth.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
+      const data3name = await this.state.nose[noseResult].name.replace('.png','');
+      this.setState({data3name});
+      const data4name = await this.state.mouth[mouthResult].name.replace('.png','');
+      this.setState({data4name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1420,6 +1497,19 @@ class App extends Component {
       const noseResult = await this.randInt(this.state.nose.length);
       const mouthResult = await this.randInt(this.state.mouth.length);
       const hairResult = await this.randInt(this.state.hair.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
+      const data3name = await this.state.nose[noseResult].name.replace('.png','');
+      this.setState({data3name});
+      const data4name = await this.state.mouth[mouthResult].name.replace('.png','');
+      this.setState({data4name});
+      const data5name = await this.state.hair[hairResult].name.replace('.png','');
+      this.setState({data5name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1462,6 +1552,21 @@ class App extends Component {
       const mouthResult = await this.randInt(this.state.mouth.length);
       const hairResult = await this.randInt(this.state.hair.length);
       const beardResult = await this.randInt(this.state.beard.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
+      const data3name = await this.state.nose[noseResult].name.replace('.png','');
+      this.setState({data3name});
+      const data4name = await this.state.mouth[mouthResult].name.replace('.png','');
+      this.setState({data4name});
+      const data5name = await this.state.hair[hairResult].name.replace('.png','');
+      this.setState({data5name});
+      const data6name = await this.state.beard[beardResult].name.replace('.png','');
+      this.setState({data6name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1509,6 +1614,23 @@ class App extends Component {
       const hairResult = await this.randInt(this.state.hair.length);
       const beardResult = await this.randInt(this.state.beard.length);
       const layer7Result = await this.randInt(this.state.layer7items.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
+      const data3name = await this.state.nose[noseResult].name.replace('.png','');
+      this.setState({data3name});
+      const data4name = await this.state.mouth[mouthResult].name.replace('.png','');
+      this.setState({data4name});
+      const data5name = await this.state.hair[hairResult].name.replace('.png','');
+      this.setState({data5name});
+      const data6name = await this.state.beard[beardResult].name.replace('.png','');
+      this.setState({data6name});
+      const data7name = await this.state.layer7items[layer7Result].name.replace('.png','');
+      this.setState({data7name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1561,6 +1683,25 @@ class App extends Component {
       const beardResult = await this.randInt(this.state.beard.length);
       const layer7Result = await this.randInt(this.state.layer7items.length);
       const layer8Result = await this.randInt(this.state.layer8items.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
+      const data3name = await this.state.nose[noseResult].name.replace('.png','');
+      this.setState({data3name});
+      const data4name = await this.state.mouth[mouthResult].name.replace('.png','');
+      this.setState({data4name});
+      const data5name = await this.state.hair[hairResult].name.replace('.png','');
+      this.setState({data5name});
+      const data6name = await this.state.beard[beardResult].name.replace('.png','');
+      this.setState({data6name});
+      const data7name = await this.state.layer7items[layer7Result].name.replace('.png','');
+      this.setState({data7name});
+      const data8name = await this.state.layer8items[layer8Result].name.replace('.png','');
+      this.setState({data8name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -1618,6 +1759,27 @@ class App extends Component {
       const layer7Result = await this.randInt(this.state.layer7items.length);
       const layer8Result = await this.randInt(this.state.layer8items.length);
       const layer9Result = await this.randInt(this.state.layer9items.length);
+
+      const data0name = await this.state.background[backgroundResult].name.replace('.png','');
+      this.setState({data0name});
+      const data1name = await this.state.head[headResult].name.replace('.png','');
+      this.setState({data1name});
+      const data2name = await this.state.eyes[eyesResult].name.replace('.png','');
+      this.setState({data2name});
+      const data3name = await this.state.nose[noseResult].name.replace('.png','');
+      this.setState({data3name});
+      const data4name = await this.state.mouth[mouthResult].name.replace('.png','');
+      this.setState({data4name});
+      const data5name = await this.state.hair[hairResult].name.replace('.png','');
+      this.setState({data5name});
+      const data6name = await this.state.beard[beardResult].name.replace('.png','');
+      this.setState({data6name});
+      const data7name = await this.state.layer7items[layer7Result].name.replace('.png','');
+      this.setState({data7name});
+      const data8name = await this.state.layer8items[layer8Result].name.replace('.png','');
+      this.setState({data8name});
+      const data9name = await this.state.layer8items[layer9Result].name.replace('.png','');
+      this.setState({data9name});
 
       var blob0 = new Blob([await this.state.background[backgroundResult]]);
       var url0  = window.URL.createObjectURL(blob0);
@@ -2489,3 +2651,4 @@ class App extends Component {
   }
 }
 export default App;
+

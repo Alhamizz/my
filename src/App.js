@@ -13,67 +13,6 @@ function timeout(delay) {
   return new Promise( res => setTimeout(res, delay) );
 }
 
-/*function generateImage(eyesResult, noseResult, mouthResult) {
-  const template = `
-  <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <bg/>
-      <head/>
-      <eyes/>
-      <nose/>
-      <mouth/>
-      <hair/>
-      <beard/>
-  </svg>
-` 
-
-  const final = template
-  //.replace('<bg/>', await this.getLayer0(this.state.backgroundResult))
-  //.replace('<head/>', await this.getLayer1(this.state.headResult))
-  .replace('<eyes/>', eyesResult)    
-  .replace('<nose/>', noseResult)
-  .replace('<mouth/>', mouthResult)
-  //.replace('<hair/>', await this.getLayer5(this.state.hairResult))
-  //.replace('<beard/>', await this.getLayer6(this.state.beardResult))
-
-  return final;
-}
-
-function checkImage(rarity, final, length, eyesLength, noseLength, mouthLength, finish){
-
-    var newFace;
-    var possibleCombinations = rarity * (this.state.head.length * eyesLength * noseLength * mouthLength * this.state.hair.length * this.state.beard.length);
-    // 9600 combinations
-
-    let reachedEnd = true;
-
-    for (var i=0; i < 100; i++){
-      newFace = final;
-      var repeated = 0;
-
-      for (var j = 1; j < length - 1; j++){
-        console.log(j);
-        //console.log(finish[j]);
-        //console.log(newFace);
-
-        if (finish[j] == newFace){
-          repeated++;  
-          console.log(repeated);
-        }         
-      }
-      if(repeated < rarity){
-        reachedEnd = false;
-        console.log('Continue');
-        break;     
-      } 
-      console.log('Repeat');
-    }
-  
-    if(reachedEnd == true){
-      console.log('No more possible combination');
-    }
-
-    return newFace; 
-}*/
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
   var angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
 
@@ -151,6 +90,26 @@ function svgUrlToPng(svgUrl, callback) {
     document.body.removeChild(svgImage);
   };
   svgImage.src = svgUrl;
+}
+
+function downloadFile(name, file) {
+  var link = document.createElement("a");
+  var blob = new Blob([file]);
+  var url  = window.URL.createObjectURL(blob);
+  link.setAttribute('download', name);
+  link.setAttribute('href', url);
+  link.click();
+  link.remove();
+}
+
+function downloadPNG(name, png) {
+
+  var link = document.createElement('a');
+  link.download = name;
+  link.style.opacity = "0";
+  link.href = png;
+  link.click();
+  link.remove();
 }
 
 class App extends Component {
@@ -316,6 +275,7 @@ class App extends Component {
     }
   }
 
+/*
   inputBackground = event => {
     const backgroundLength = event.target.files.length;
     this.setState({backgroundLength});
@@ -389,6 +349,7 @@ class App extends Component {
     }
     //console.log(beard[0])
   };
+*/
 
   async generate(prefix, description, url, rarity, items){  
 
@@ -406,8 +367,9 @@ class App extends Component {
     console.log(this.state.mouth);
     console.log(this.state.hair);
     console.log(this.state.beard);
-
-
+    console.log(this.state.layer7items);
+    console.log(this.state.layer8items);
+    console.log(this.state.layer9items);
 
     var itemsInput = [
       [ this.state.background ],
@@ -417,6 +379,9 @@ class App extends Component {
       [ this.state.mouth ],
       [ this.state.hair ],
       [ this.state.beard ],
+      [ this.state.layer7items ],
+      [ this.state.layer8items ],
+      [ this.state.layer9items ],
     ];
 
     this.setState({itemsInput});
@@ -428,7 +393,7 @@ class App extends Component {
 
     do {
       await this.createImage(idx, prefix, description, url, rarity, items);
-      await timeout(1000); //for 0.4 sec delay
+      await timeout(500); //for 0.5 sec delay
       if ( idx < items && idx > 0){
         if ( i === 0 || i === 4 ){
           i = 1;
@@ -600,19 +565,64 @@ class App extends Component {
     };
     return Math.random() > skip ? this.state.layer6 : '';
   }
+
+  async getLayer7(layer7itemsnum, skip=0.0) {
+
+    const data7 = this.state.layer7items[layer7itemsnum]; 
+    const data7name = data7.name;
+    this.setState({data7name});
+
+    const reader = new FileReader();
+    reader.readAsText(data7);
+    reader.onload = (e) => {
+      const svg = reader.result;
+      const re = /(?<=\<svg\s*[^>]*>)([\s\S]*?)(?=\<\/svg\>)/g
+      const layer7 = svg.match(re)[0];
+      this.setState({layer7});
+    };
+    return Math.random() > skip ? this.state.layer7 : '';
+  }
+
+  async getLayer8(layer8itemsnum, skip=0.0) {
+
+    const data8 = this.state.layer8items[layer8itemsnum]; 
+    const data8name = data8.name;
+    this.setState({data8name});
+
+    const reader = new FileReader();
+    reader.readAsText(data8);
+    reader.onload = (e) => {
+      const svg = reader.result;
+      const re = /(?<=\<svg\s*[^>]*>)([\s\S]*?)(?=\<\/svg\>)/g
+      const layer8 = svg.match(re)[0];
+      this.setState({layer8});
+    };
+    return Math.random() > skip ? this.state.layer8 : '';
+  }
+
+  async getLayer9(layer9itemsnum, skip=0.0) {
+
+    const data9 = this.state.layer9items[layer9itemsnum]; 
+    const data9name = data9.name;
+    this.setState({data9name});
+
+    const reader = new FileReader();
+    reader.readAsText(data9);
+    reader.onload = (e) => {
+      const svg = reader.result;
+      const re = /(?<=\<svg\s*[^>]*>)([\s\S]*?)(?=\<\/svg\>)/g
+      const layer9 = svg.match(re)[0];
+      this.setState({layer9});
+    };
+    return Math.random() > skip ? this.state.layer9 : '';
+  }
   
-  async combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult) {
+  async combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result, layer8Result, layer9Result) {
 
     if(this.state.number == 1){
       const template = `
       <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
           <bg/>
-          <head/>
-          <eyes/>
-          <nose/>
-          <mouth/>
-          <hair/>
-          <beard/>
       </svg>
       ` 
   
@@ -625,11 +635,6 @@ class App extends Component {
       <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
           <bg/>
           <head/>
-          <eyes/>
-          <nose/>
-          <mouth/>
-          <hair/>
-          <beard/>
       </svg>
       ` 
   
@@ -645,10 +650,6 @@ class App extends Component {
           <bg/>
           <head/>
           <eyes/>
-          <nose/>
-          <mouth/>
-          <hair/>
-          <beard/>
       </svg>
       ` 
   
@@ -666,9 +667,6 @@ class App extends Component {
           <head/>
           <eyes/>
           <nose/>
-          <mouth/>
-          <hair/>
-          <beard/>
       </svg>
       ` 
   
@@ -687,8 +685,6 @@ class App extends Component {
           <eyes/>
           <nose/>
           <mouth/>
-          <hair/>
-          <beard/>
       </svg>
       ` 
   
@@ -709,8 +705,6 @@ class App extends Component {
           <eyes/>
           <nose/>
           <mouth/>
-          <hair/>
-          <beard/>
       </svg>
       ` 
   
@@ -745,6 +739,88 @@ class App extends Component {
       .replace('<hair/>', hairResult)
       .replace('<beard/>', beardResult)
   
+      return final;
+    }else if(this.state.number == 8){
+      const template = `
+      <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <bg/>
+          <head/>
+          <eyes/>
+          <nose/>
+          <mouth/>
+          <hair/>
+          <beard/>
+          <layer7/>
+      </svg>
+      ` 
+  
+      const final = template
+      .replace('<bg/>', backgroundResult)
+      .replace('<head/>', headResult)
+      .replace('<eyes/>', eyesResult)    
+      .replace('<nose/>', noseResult)
+      .replace('<mouth/>', mouthResult)
+      .replace('<hair/>', hairResult)
+      .replace('<beard/>', beardResult)
+      .replace('<hair/>', layer7Result)
+  
+      return final;
+    }else if(this.state.number == 9){
+      const template = `
+      <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <bg/>
+          <head/>
+          <eyes/>
+          <nose/>
+          <mouth/>
+          <hair/>
+          <beard/>
+          <layer7/>
+          <layer8/>
+      </svg>
+      ` 
+  
+      const final = template
+      .replace('<bg/>', backgroundResult)
+      .replace('<head/>', headResult)
+      .replace('<eyes/>', eyesResult)    
+      .replace('<nose/>', noseResult)
+      .replace('<mouth/>', mouthResult)
+      .replace('<hair/>', hairResult)
+      .replace('<beard/>', beardResult)
+      .replace('<hair/>', layer7Result)
+      .replace('<beard/>', layer8Result)
+      
+  
+      return final;
+    }else if(this.state.number == 10){
+      const template = `
+      <svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <bg/>
+          <head/>
+          <eyes/>
+          <nose/>
+          <mouth/>
+          <hair/>
+          <beard/>
+          <layer7/>
+          <layer8/>
+          <layer9/>
+      </svg>
+      ` 
+  
+      const final = template
+      .replace('<bg/>', backgroundResult)
+      .replace('<head/>', headResult)
+      .replace('<eyes/>', eyesResult)    
+      .replace('<nose/>', noseResult)
+      .replace('<mouth/>', mouthResult)
+      .replace('<hair/>', hairResult)
+      .replace('<beard/>', beardResult)
+      .replace('<layer7/>', layer7Result)
+      .replace('<layer8/>', layer8Result)
+      .replace('<layer9/>', layer9Result)
+
       return final;
     };
 
@@ -815,10 +891,52 @@ class App extends Component {
       const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult);
 
       return final;
+    } else if(this.state.number == 8){
+      const backgroundResult = await this.getLayer0(await this.randInt(this.state.background.length));
+      const headResult = await this.getLayer1(await this.randInt(this.state.head.length));
+      const eyesResult = await this.getLayer2(await this.randInt(this.state.eyes.length));
+      const noseResult = await this.getLayer3(await this.randInt(this.state.nose.length));
+      const mouthResult = await this.getLayer4(await this.randInt(this.state.mouth.length));
+      const hairResult = await this.getLayer5(await this.randInt(this.state.hair.length));
+      const beardResult = await this.getLayer6(await this.randInt(this.state.beard.length));
+      const layer7Result = await this.getLayer7(await this.randInt(this.state.beard.length));
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result);
+
+      return final;
+    } else if(this.state.number == 9){
+      const backgroundResult = await this.getLayer0(await this.randInt(this.state.background.length));
+      const headResult = await this.getLayer1(await this.randInt(this.state.head.length));
+      const eyesResult = await this.getLayer2(await this.randInt(this.state.eyes.length));
+      const noseResult = await this.getLayer3(await this.randInt(this.state.nose.length));
+      const mouthResult = await this.getLayer4(await this.randInt(this.state.mouth.length));
+      const hairResult = await this.getLayer5(await this.randInt(this.state.hair.length));
+      const beardResult = await this.getLayer6(await this.randInt(this.state.beard.length));
+      const layer7Result = await this.getLayer7(await this.randInt(this.state.beard.length));
+      const layer8Result = await this.getLayer8(await this.randInt(this.state.beard.length));
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result, layer8Result);
+
+      return final;
+    } else if(this.state.number == 10){
+      const backgroundResult = await this.getLayer0(await this.randInt(this.state.background.length));
+      const headResult = await this.getLayer1(await this.randInt(this.state.head.length));
+      const eyesResult = await this.getLayer2(await this.randInt(this.state.eyes.length));
+      const noseResult = await this.getLayer3(await this.randInt(this.state.nose.length));
+      const mouthResult = await this.getLayer4(await this.randInt(this.state.mouth.length));
+      const hairResult = await this.getLayer5(await this.randInt(this.state.hair.length));
+      const beardResult = await this.getLayer6(await this.randInt(this.state.beard.length));
+      const layer7Result = await this.getLayer7(await this.randInt(this.state.layer7items.length));
+      const layer8Result = await this.getLayer8(await this.randInt(this.state.layer8items.length));
+      const layer9Result = await this.getLayer9(await this.randInt(this.state.layer9items.length));
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result, layer8Result, layer9Result);
+
+      return final;
     };
   }
 
-  async checkImage(rarity, length, finish){
+  async checkImage(rarity){
   
     var newFace;
     //var possibleCombinations = rarity * (/*this.state.head.length **/ eyesLength * noseLength * mouthLength /** this.state.hair.length * this.state.beard.length*/);
@@ -830,12 +948,12 @@ class App extends Component {
       newFace = await this.generateRandomImages();
       var repeated = 0;
 
-      for (var j = 0; j < length ; j++){
+      for (var j = 0; j < this.state.finish.length ; j++){
         //console.log(j);
         //console.log(finish[j]);
         //console.log(newFace);
 
-        if (finish[j] == newFace){
+        if (this.state.finish[j] == newFace){
           repeated++;  
           //console.log(repeated);
         }         
@@ -859,12 +977,7 @@ class App extends Component {
 
     const final = await this.generateRandomImages();
 
-    const length = this.state.finish.length;
-    var finish = [];
-    finish = this.state.finish;
-
-
-    var newFace = await this.checkImage(rarity, final, length, finish);
+    var newFace = await this.checkImage(rarity, final);
 
     this.state.finish.push(newFace);
      
@@ -874,7 +987,7 @@ class App extends Component {
     if(this.state.number == 1){
       const meta = {
       
-        name: `${prefix} # ${idx}`,
+        name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
@@ -885,14 +998,15 @@ class App extends Component {
     } else if(this.state.number == 2){
       const meta = {
       
-        name: `${prefix} # ${idx}`,
+        name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
         attributes: [
     
           { 
-            head: await this.state.data1name,
+            trait_type: "Layer1",
+            value: await this.state.data1name,
             rarity: `${rarity}`
           }         
         ]
@@ -902,18 +1016,20 @@ class App extends Component {
     } else if(this.state.number == 3){
       const meta = {
       
-        name: `${prefix} # ${idx}`,
+        name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
         attributes: [
     
           { 
-            head: await this.state.data1name,
+            trait_type: "Layer1",
+            value: await this.state.data1name,
             rarity: `${rarity}`
           },
           { 
-            eyes: await this.state.data2name,
+            trait_type: "Layer2",
+            value: await this.state.data2name,
             rarity: `${rarity}`
           }
         ]
@@ -923,22 +1039,25 @@ class App extends Component {
     } else if(this.state.number == 4){
       const meta = {
       
-        name: `${prefix} # ${idx}`,
+        name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
         attributes: [
     
           { 
-            head: await this.state.data1name,
+            trait_type: "Layer1",
+            value: await this.state.data1name,
             rarity: `${rarity}`
           },
           { 
-            eyes: await this.state.data2name,
+            trait_type: "Layer2",
+            value: await this.state.data2name,
             rarity: `${rarity}`
           },
           { 
-            nose: await this.state.data3name,
+            trait_type: "Layer3",
+            value: await this.state.data3name,
             rarity: `${rarity}`
           }
         ]
@@ -948,26 +1067,30 @@ class App extends Component {
     } else if(this.state.number == 5){
       const meta = {
       
-        name: `${prefix} # ${idx}`,
+        name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
         attributes: [
     
           { 
-            head: await this.state.data1name,
+            trait_type: "Layer1",
+            value: await this.state.data1name,
             rarity: `${rarity}`
           },
           { 
-            eyes: await this.state.data2name,
+            trait_type: "Layer2",
+            value: await this.state.data2name,
             rarity: `${rarity}`
           },
           { 
-            nose: await this.state.data3name,
+            trait_type: "Layer3",
+            value: await this.state.data3name,
             rarity: `${rarity}`
           },
           { 
-            mouth: await this.state.data4name,
+            trait_type: "Layer4",
+            value: await this.state.data4name,
             rarity: `${rarity}`
           }
         ]
@@ -977,30 +1100,35 @@ class App extends Component {
     } else if(this.state.number == 6){
       const meta = {
       
-        name: `${prefix} # ${idx}`,
+        name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
         attributes: [
     
           { 
-            head: await this.state.data1name,
+            trait_type: "Layer1",
+            value: await this.state.data1name,
             rarity: `${rarity}`
           },
           { 
-            eyes: await this.state.data2name,
+            trait_type: "Layer2",
+            value: await this.state.data2name,
             rarity: `${rarity}`
           },
           { 
-            nose: await this.state.data3name,
+            trait_type: "Layer3",
+            value: await this.state.data3name,
             rarity: `${rarity}`
           },
           { 
-            mouth: await this.state.data4name,
+            trait_type: "Layer4",
+            value: await this.state.data4name,
             rarity: `${rarity}`
           },
           { 
-            hair: await this.state.data5name,
+            trait_type: "Layer5",
+            value: await this.state.data5name,
             rarity: `${rarity}`
           }
         ]
@@ -1010,40 +1138,203 @@ class App extends Component {
     } else if(this.state.number == 7){
       const meta = {
       
-        name: `${prefix} # ${idx}`,
+        name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
         attributes: [
     
           { 
-            head: await this.state.data1name,
+            trait_type: "Layer1",
+            value: await this.state.data1name,
             rarity: `${rarity}`
           },
           { 
-            eyes: await this.state.data2name,
+            trait_type: "Layer2",
+            value: await this.state.data2name,
             rarity: `${rarity}`
           },
           { 
-            nose: await this.state.data3name,
+            trait_type: "Layer3",
+            value: await this.state.data3name,
             rarity: `${rarity}`
           },
           { 
-            mouth: await this.state.data4name,
+            trait_type: "Layer4",
+            value: await this.state.data4name,
             rarity: `${rarity}`
           },
           { 
-            hair: await this.state.data5name,
+            trait_type: "Layer5",
+            value: await this.state.data5name,
             rarity: `${rarity}`
           },
           { 
-            beard: await this.state.data6name,
+            trait_type: "Layer6",
+            value: await this.state.data6name,
             rarity: `${rarity}`
           }
         ]
       } 
       this.setState({meta});
 
+    } else if(this.state.number == 8){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: "Layer1",
+            value: await this.state.data1name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer2",
+            value: await this.state.data2name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer3",
+            value: await this.state.data3name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer4",
+            value: await this.state.data4name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer5",
+            value: await this.state.data5name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer6",
+            value: await this.state.data6name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer7",
+            value: await this.state.data7name,
+            rarity: `${rarity}`
+          },
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 9){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: "Layer1",
+            value: await this.state.data1name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer2",
+            value: await this.state.data2name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer3",
+            value: await this.state.data3name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer4",
+            value: await this.state.data4name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer5",
+            value: await this.state.data5name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer6",
+            value: await this.state.data6name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer7",
+            value: await this.state.data7name,
+            rarity: `${rarity}`
+          },          { 
+            trait_type: "Layer8",
+            value: await this.state.data8name,
+            rarity: `${rarity}`
+          }
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 10){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: "Layer1",
+            value: await this.state.data1name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer2",
+            value: await this.state.data2name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer3",
+            value: await this.state.data3name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer4",
+            value: await this.state.data4name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer5",
+            value: await this.state.data5name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer6",
+            value: await this.state.data6name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer7",
+            value: await this.state.data7name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer8",
+            value: await this.state.data8name,
+            rarity: `${rarity}`
+          },
+          { 
+            trait_type: "Layer9",
+            value: await this.state.data9name,
+            rarity: `${rarity}`
+          }
+        ]
+      } 
+      this.setState({meta});
     };
 
     svgToPng(newFace, (imgData) => {
@@ -1054,62 +1345,50 @@ class App extends Component {
         let context = canvas.getContext('2d');
 
         context.drawImage(image, 0, 0, 150, 150);
+        var png = [];
 
-        let png = canvas.toDataURL();
-        this.setState({png});  
+        png = canvas.toDataURL().toString();
+        this.setState({png});
+        this.state.png.push(png) ;
       };
 
       image.src = imgData;
       const result =image.src;
       this.setState({result});
+      
     }); 
 
     if(idx < items && idx > 0){
       //await this.downloadFile(`${idx}.svg`, final)
-      await this.downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
+      await downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
     }
 
     if(idx < (items - 1)){
-      await this.downloadPNG(`${idx + 1}.png`, this.state.png)
+      await downloadPNG(`${idx + 1}.png`, this.state.png)
     }      
   } 
 
- async downloadFile(name, file) {
-    var link = document.createElement("a");
-    var blob = new Blob([file]);
-    var url  = window.URL.createObjectURL(blob);
-    link.setAttribute('download', name);
-    link.setAttribute('href', url);
-    link.click();
-    link.remove();
-  }
-
-  async downloadPNG(name, png) {
-
-    var link = document.createElement('a');
-    link.download = name;
-    link.style.opacity = "0";
-    link.href = png;
-    link.click();
-    link.remove();
-  }
-
-  /*async downloadzipPNG(name, png) {
+  async downloadzipPNG() {
 
     var JSZip = require("jszip");
     let jsZip = new JSZip();
     let folder = jsZip.folder("images");
+    const png = this.state.png;
 
-    let baseString = getBase64String(png);
-    folder.file(name, baseString, {base64 : true});
+    for (var i = 0; i < this.state.finish.length; i++){
+      let baseString = getBase64String(this.state.png[i]);
+      console.log(baseString);
+      folder.file(`${i + 1}`.png, baseString, {base64 : true});
+      console.log(folder);
 
+    }
     jsZip.generateAsync({type:"blob"}).then(function (content) {
       content = URL.createObjectURL(content);
       let name = `JSJeep.zip`;
-      this.downloadPNG(name, png); // already written above
-      console.log('abc')
+      downloadPNG(name, png); // already written above
     });
-  }*/
+
+  }
 
   async addFields(){
     // Generate a dynamic number of inputs
@@ -1142,6 +1421,15 @@ class App extends Component {
       };
       if(x === 6){
         value = this.state.beard;
+      };
+      if(x === 7){
+        value = this.state.layer7items;
+      };
+      if(x === 8){
+        value = this.state.layer8items;
+      };
+      if(x === 9){
+        value = this.state.layer9items;
       };
 
       for (var m = 0; m < event.target.files.length ; m++){
@@ -1193,6 +1481,7 @@ class App extends Component {
       second: '0',
       name: 'undefined',
       description: 'undefined',
+
       layer0: 'undefined',
       layer1: 'undefined',
       layer2: 'undefined',
@@ -1200,6 +1489,10 @@ class App extends Component {
       layer4: 'undefined',
       layer5: 'undefined',
       layer6: 'undefined',
+      layer7: 'undefined',
+      layer8: 'undefined',
+      layer9: 'undefined',
+
       layerLength: [],
       imgData: [],
       takenFaces: [],
@@ -1211,9 +1504,14 @@ class App extends Component {
       mouth: [],
       hair: [],
       beard: [], 
+      layer7items: [],
+      layer8items: [],
+      layer9items: [],
+      
   
       itemsInput: [],
-      finish: []
+      finish: [],
+      png: []
 
     }
       this.addFields = this.addFields.bind(this);
@@ -1452,12 +1750,12 @@ class App extends Component {
                                   <br></br>  
                                   <h5>Input Layers:</h5>  
 
-                                  <label htmlFor="Layers" style={{float: "left"}}>Number of layers: (max. 7)</label>
+                                  <label htmlFor="Layers" style={{float: "left"}}>Number of layers: (max. 10)</label>
                                       <input
                                         id='Layers' 
                                         type='number'
                                         min ="1"
-                                        max = "7"
+                                        max = "10"
                                         className="form-control form-control-md"/> 
 
                                 <a href="#" id="filldetails" onClick={this.addFields}>Fill Details</a>
@@ -1473,6 +1771,15 @@ class App extends Component {
                                   </div>
                                   <div id="board"></div>                                
                                   
+                                </form>
+                                
+                                <form onSubmit={(e) => {
+                                  e.preventDefault()
+                                  this.downloadzipPNG();
+                                  
+                                }}>
+                                                                 
+                                  <button type='submit' className='btn btn-primary'>Download</button>
                                 </form>
 
                               </div>

@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import { Tabs, Tab } from 'react-bootstrap';
 import React, {Component } from "react";
 import './App.css';
+import mergeImages from 'merge-images';
 
 
 function timeout(delay) {
@@ -273,6 +274,11 @@ class App extends Component {
     var i = 0;
     var idx = items ;
 
+    const data0 = await this.state.background[0]; 
+    const data0name = data0.name;
+    const re = 'svg';
+    const imageType = await data0name.match(re);
+
     console.log(this.state.background);
     console.log(this.state.head);
     console.log(this.state.eyes);
@@ -303,14 +309,43 @@ class App extends Component {
 
 
     do {
-      await this.createImage(idx, prefix, description, url, rarity, items);
-      await timeout(500); //for 0.5 sec delay
-      if ( idx < items && idx > 0){
+
+      if(imageType == 'svg'){
+        await this.createImage(idx, prefix, description, url, rarity, items);
+        await timeout(500); //for 0.5 sec delay
+        if ( idx < items && idx > 0){
+          if ( i === 0 || i === 4 ){
+            i = 1;
+            row = document.createElement("tr");
+            cell = document.createElement("td");
+            cell.innerHTML = `<img src=${this.state.result}  />`;  
+            console.log(this.state.result);
+            row.appendChild(cell);
+            tblBody.appendChild(row);        
+            tbl.appendChild(tblBody);
+            brd.appendChild(tbl);
+    
+          }else {
+            i = i + 1;
+            var cell = document.createElement("td");
+            cell.innerHTML = `<img src=${this.state.result}  />`;
+            row.appendChild(cell);
+            tblBody.appendChild(row);        
+            tbl.appendChild(tblBody);
+            brd.appendChild(tbl);
+          }      
+        }
+      } else {
+
+        await this.createPNG(idx, prefix, description, url, rarity, items);
+        await timeout(500); //for 0.5 sec delay
+
         if ( i === 0 || i === 4 ){
           i = 1;
           row = document.createElement("tr");
           cell = document.createElement("td");
           cell.innerHTML = `<img src=${this.state.result}  />`;  
+          console.log(this.state.result);
           row.appendChild(cell);
           tblBody.appendChild(row);        
           tbl.appendChild(tblBody);
@@ -325,7 +360,8 @@ class App extends Component {
           tbl.appendChild(tblBody);
           brd.appendChild(tbl);
         }      
-      }
+      }  
+      
  
       idx--;
     } while (idx >= 0);
@@ -358,9 +394,8 @@ class App extends Component {
 
   async getLayer0(backgroundnum, skip=0.0) {
 
-    const data0 = this.state.background[backgroundnum]; 
-    const data0fullname = data0.name;
-    const data0name = data0fullname.replace('.svg','');
+    const data0 = await this.state.background[backgroundnum]; 
+    const data0name = await data0.name.replace('.svg','');
     this.setState({data0name});
 
     const reader = new FileReader();
@@ -1227,6 +1262,449 @@ class App extends Component {
     if(idx < items && idx > 0){
       //await this.downloadFile(`${idx}.svg`, final)
       downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
+    }
+
+    if(idx < (items - 1)){
+      //downloadPNG(`${idx + 1}.png`, this.state.png)
+    }      
+  } 
+
+  async createPNG(idx, prefix, description, url, rarity, items) {
+
+    if(this.state.number == 1){
+      const backgroundResult = this.randInt(this.state.background.length);
+
+      const result = mergeImages([this.state.background[backgroundResult]])
+        .then(b64 => document.querySelector('img').src = b64)
+      
+      this.state.result = await result;     
+
+    } else if(this.state.number == 2){
+      const backgroundResult = this.randInt(this.state.background.length);
+      const headResult = this.randInt(this.state.head.length);
+
+      const result = mergeImages([this.state.background[backgroundResult], this.state.head[headResult]])
+        .then(b64 => document.querySelector('img').src = b64)
+      
+      this.state.result = await result; 
+
+    } else if(this.state.number == 3){
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      
+      const result = mergeImages([(this.state.background[backgroundResult]), (this.state.head[headResult]),( this.state.mouth[eyesResult])])
+        .then(b64 => document.querySelector('img').src = b64)
+    
+      this.state.result = await result; 
+      console.log(result)
+
+
+    } else if(this.state.number == 4){
+      const backgroundResult = this.randInt(this.state.background.length);
+      const headResult = this.randInt(this.state.head.length);
+      const eyesResult = this.randInt(this.state.eyes.length);
+      const noseResult = this.randInt(this.state.nose.length);
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult);
+
+      return final;
+    } else if(this.state.number == 5){
+      const backgroundResult = this.randInt(this.state.background.length);
+      const headResult = this.randInt(this.state.head.length);
+      const eyesResult = this.randInt(this.state.eyes.length);
+      const noseResult = this.randInt(this.state.nose.length);
+      const mouthResult = this.randInt(this.state.mouth.length);
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult);
+
+      return final;
+    } else if(this.state.number == 6){
+      const backgroundResult =  this.randInt(this.state.background.length);
+      const headResult = this.randInt(this.state.head.length);
+      const eyesResult = this.randInt(this.state.eyes.length);
+      const noseResult = this.randInt(this.state.nose.length);
+      const mouthResult = this.randInt(this.state.mouth.length);
+      const hairResult = this.randInt(this.state.hair.length);
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult);
+
+      return final;
+    } else if(this.state.number == 7){
+      const backgroundResult = this.randInt(this.state.background.length);
+      const headResult = this.randInt(this.state.head.length);
+      const eyesResult = this.randInt(this.state.eyes.length);
+      const noseResult = this.randInt(this.state.nose.length);
+      const mouthResult = this.randInt(this.state.mouth.length);
+      const hairResult = this.randInt(this.state.hair.length);
+      const beardResult = this.randInt(this.state.beard.length);
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult);
+
+      return final;
+    } else if(this.state.number == 8){
+      const backgroundResult = this.randInt(this.state.background.length);
+      const headResult = this.randInt(this.state.head.length);
+      const eyesResult = this.randInt(this.state.eyes.length);
+      const noseResult = this.randInt(this.state.nose.length);
+      const mouthResult = this.randInt(this.state.mouth.length);
+      const hairResult = this.randInt(this.state.hair.length);
+      const beardResult = this.randInt(this.state.beard.length);
+      const layer7Result = this.randInt(this.state.beard.length);
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result);
+
+      return final;
+    } else if(this.state.number == 9){
+      const backgroundResult = this.randInt(this.state.background.length);
+      const headResult = this.randInt(this.state.head.length);
+      const eyesResult = this.randInt(this.state.eyes.length);
+      const noseResult = this.randInt(this.state.nose.length);
+      const mouthResult = this.randInt(this.state.mouth.length);
+      const hairResult = this.randInt(this.state.hair.length);
+      const beardResult = this.randInt(this.state.beard.length);
+      const layer7Result = this.randInt(this.state.beard.length);
+      const layer8Result = this.randInt(this.state.beard.length);
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result, layer8Result);
+
+      return final;
+    } else if(this.state.number == 10){
+      const backgroundResult = await this.randInt(this.state.background.length);
+      const headResult = await this.randInt(this.state.head.length);
+      const eyesResult = await this.randInt(this.state.eyes.length);
+      const noseResult = await this.randInt(this.state.nose.length);
+      const mouthResult = await this.randInt(this.state.mouth.length);
+      const hairResult = await this.randInt(this.state.hair.length);
+      const beardResult = await this.randInt(this.state.beard.length);
+      const layer7Result = await this.randInt(this.state.layer7items.length);
+      const layer8Result = await this.randInt(this.state.layer8items.length);
+      const layer9Result =await this.randInt(this.state.layer9items.length);
+
+      const final = this.combineImage(backgroundResult, headResult, eyesResult, noseResult, mouthResult, hairResult, beardResult, layer7Result, layer8Result, layer9Result);
+
+      return final;
+    };
+
+    //var newFace = await this.checkImage(rarity);
+
+    //this.state.finish.push(newFace);
+     
+    const name = await this.getRandomName();
+    //console.log(name);
+
+    if(this.state.number == 1){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: []
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 2){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          }         
+        ]
+      } 
+      this.setState({meta});
+      
+    } else if(this.state.number == 3){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          }
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 4){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          },
+          { 
+            trait_type: this.state.layerName[4],
+            value: await this.state.data3name,
+          }
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 5){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          },
+          { 
+            trait_type: this.state.layerName[4],
+            value: await this.state.data3name,
+          },
+          { 
+            trait_type: this.state.layerName[5],
+            value: await this.state.data4name,
+          }
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 6){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          },
+          { 
+            trait_type: this.state.layerName[4],
+            value: await this.state.data3name,
+          },
+          { 
+            trait_type: this.state.layerName[5],
+            value: await this.state.data4name,
+          },
+          { 
+            trait_type: this.state.layerName[6],
+            value: await this.state.data5name,
+          }
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 7){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          },
+          { 
+            trait_type: this.state.layerName[4],
+            value: await this.state.data3name,
+          },
+          { 
+            trait_type: this.state.layerName[5],
+            value: await this.state.data4name,
+          },
+          { 
+            trait_type: this.state.layerName[6],
+            value: await this.state.data5name,
+          },
+          { 
+            trait_type: this.state.layerName[7],
+            value: await this.state.data6name,
+          }
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 8){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          },
+          { 
+            trait_type: this.state.layerName[4],
+            value: await this.state.data3name,
+          },
+          { 
+            trait_type: this.state.layerName[5],
+            value: await this.state.data4name,
+          },
+          { 
+            trait_type: this.state.layerName[6],
+            value: await this.state.data5name,
+          },
+          { 
+            trait_type: this.state.layerName[7],
+            value: await this.state.data6name,
+          },
+          { 
+            trait_type: this.state.layerName[8],
+            value: await this.state.data7name,
+          },
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 9){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          },
+          { 
+            trait_type: this.state.layerName[4],
+            value: await this.state.data3name,
+          },
+          { 
+            trait_type: this.state.layerName[5],
+            value: await this.state.data4name,
+          },
+          { 
+            trait_type: this.state.layerName[6],
+            value: await this.state.data5name,
+          },
+          { 
+            trait_type: this.state.layerName[7],
+            value: await this.state.data6name,
+          },
+          { 
+            trait_type: this.state.layerName[8],
+            value: await this.state.data7name,
+          },          { 
+            trait_type: this.state.layerName[9],
+            value: await this.state.data8name,
+          }
+        ]
+      } 
+      this.setState({meta});
+
+    } else if(this.state.number == 10){
+      const meta = {
+      
+        name: `${prefix} #${idx}`,
+        description: `${description} ${name.split('-').join(' ')}`,
+        image : ``,
+        external_url : `${url}`,
+        attributes: [
+    
+          { 
+            trait_type: this.state.layerName[2],
+            value: await this.state.data1name,
+          },
+          { 
+            trait_type: this.state.layerName[3],
+            value: await this.state.data2name,
+          },
+          { 
+            trait_type: this.state.layerName[4],
+            value: await this.state.data3name,
+          },
+          { 
+            trait_type: this.state.layerName[5],
+            value: await this.state.data4name,
+          },
+          { 
+            trait_type: this.state.layerName[6],
+            value: await this.state.data5name,
+          },
+          { 
+            trait_type: this.state.layerName[7],
+            value: await this.state.data6name,
+          },
+          { 
+            trait_type: this.state.layerName[8],
+            value: await this.state.data7name,
+          },
+          { 
+            trait_type: this.state.layerName[9],
+            value: await this.state.data8name,
+          },
+          { 
+            trait_type: this.state.layerName[10],
+            value: await this.state.data9name,
+          }
+        ]
+      } 
+      this.setState({meta});
+    };
+
+
+    if(idx < items && idx > 0){
+      //await this.downloadFile(`${idx}.svg`, final)
+      //downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
     }
 
     if(idx < (items - 1)){

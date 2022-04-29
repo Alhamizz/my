@@ -412,6 +412,21 @@ class App extends Component {
         }     
       }   
       idx--;
+
+      if(idx == 0){
+        var containerButton = document.getElementById("containerButton");
+        containerButton.appendChild(document.createElement("br"));   
+        var button = document.createElement("button");
+        button.innerHTML = 'Download'
+        button.className='btn btn-primary'
+
+        button.onclick = function (){
+          this.downloadzipJSON();
+          this.downloadzipPNG();
+      }.bind(this);
+        containerButton.appendChild(button);
+        
+      }
     } while (idx >= 0);
   }
 
@@ -2296,10 +2311,6 @@ async createPNG(idx, prefix, description, url, rarity, items) {
  
       container.appendChild(document.createTextNode("Layer " + (i+1)));
 
-      var form = document.createElement("form");
-      form.method = "post";
-      form.encType = "multipart/form-data";
-
       var input = document.createElement("input");
 
       input.id = 'Layer' + i;
@@ -2321,8 +2332,7 @@ async createPNG(idx, prefix, description, url, rarity, items) {
       input.onchange = inputLayer;
 
 
-      container.appendChild(input); 
-      container.appendChild(form); 
+      container.appendChild(input);  
       container.appendChild(document.createElement("br"));   
     }
   }
@@ -2619,8 +2629,6 @@ async createPNG(idx, prefix, description, url, rarity, items) {
                                 <a href="#" id="filldetails" onClick={this.addFields}>Fill Details</a>
                                 <div id="container"/>
 
-                                  <br></br>
-
                                   <button type='submit' className='btn btn-primary'>Generate</button>
                                   <br></br>
                                   <br></br>
@@ -2630,16 +2638,8 @@ async createPNG(idx, prefix, description, url, rarity, items) {
                                   <div id="board"></div>                                
                                   
                                 </form>
-                                
-                                <form onSubmit={(e) => {
-                                  e.preventDefault()
-                                  this.downloadzipPNG();
-                                  this.downloadzipJSON();
-                                  
-                                }}>
-                                                                 
-                                  <button type='submit' className='btn btn-primary'>Download</button>
-                                </form>
+
+                                <div id="containerButton"/>
 
                               </div>
 

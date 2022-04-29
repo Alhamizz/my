@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import { Tabs, Tab } from 'react-bootstrap';
 import React, {Component } from "react";
 import './App.css';
+import { saveAs } from 'file-saver';
 
 const { createCanvas, loadImage } = require("canvas");
 
@@ -347,8 +348,12 @@ class App extends Component {
     ];
 
     this.setState({itemsInput});
+    var svg = [];
+    this.setState({svg});
     var finish = [];
     this.setState({finish});
+    var JSON = [];
+    this.setState({JSON});
 
 
     do {
@@ -405,9 +410,7 @@ class App extends Component {
             brd.appendChild(tbl);
           } 
         }     
-      }  
-      
- 
+      }   
       idx--;
     } while (idx >= 0);
   }
@@ -422,19 +425,19 @@ class App extends Component {
 
   async getRandomName() {
     const takenNames = {};
-        const adjectives = 'fired trashy tubular nasty jacked swol buff ferocious firey flamin agnostic artificial bloody crazy cringey crusty dirty eccentric glutinous harry juicy simple stylish awesome creepy corny freaky shady sketchy lame sloppy hot intrepid juxtaposed killer ludicrous mangy pastey ragin rusty rockin sinful shameful stupid sterile ugly vascular wild young old zealous flamboyant super sly shifty trippy fried injured depressed anxious clinical'.split(' ');
-        const names = 'aaron bart chad dale earl fred grady harry ivan jeff joe kyle lester steve tanner lucifer todd mitch hunter mike arnold norbert olaf plop quinten randy saul balzac tevin jack ulysses vince will xavier yusuf zack roger raheem rex dustin seth bronson dennis'.split(' ');
+      const adjectives = 'fired trashy tubular nasty jacked swol buff ferocious firey flamin agnostic artificial bloody crazy cringey crusty dirty eccentric glutinous harry juicy simple stylish awesome creepy corny freaky shady sketchy lame sloppy hot intrepid juxtaposed killer ludicrous mangy pastey ragin rusty rockin sinful shameful stupid sterile ugly vascular wild young old zealous flamboyant super sly shifty trippy fried injured depressed anxious clinical'.split(' ');
+      const names = 'aaron bart chad dale earl fred grady harry ivan jeff joe kyle lester steve tanner lucifer todd mitch hunter mike arnold norbert olaf plop quinten randy saul balzac tevin jack ulysses vince will xavier yusuf zack roger raheem rex dustin seth bronson dennis'.split(' ');
         
-        const randAdj = await this.randElement(adjectives);
-        const randName = await this.randElement(names);
-        const name = `${randAdj}-${randName}`;
+      const randAdj = await this.randElement(adjectives);
+      const randName = await this.randElement(names);
+      const name = `${randAdj}-${randName}`;
 
-        if (takenNames[name] || !name) {
-            return this.getRandomName();
-        } else {
-            takenNames[name] = name;
-            return name;
-        }
+      if (takenNames[name] || !name) {
+        return this.getRandomName();
+      } else {
+        takenNames[name] = name;
+        return name;
+      }
   }
 
   async getLayer0(backgroundnum, skip=0.0) {
@@ -451,7 +454,6 @@ class App extends Component {
       const layer0 = svg.match(re)[0];
       this.setState({layer0});
     };
-
     return Math.random() > skip ? this.state.layer0 : '';
   }
 
@@ -939,12 +941,12 @@ class App extends Component {
       newFace = await this.generateRandomImages();
       var repeated = 0;
 
-      for (var j = 0; j < this.state.finish.length ; j++){
+      for (var j = 0; j < this.state.svg.length ; j++){
         //console.log(j);
         //console.log(finish[j]);
         //console.log(newFace);
 
-        if (this.state.finish[j] == newFace){
+        if (this.state.svg[j] == newFace){
           repeated++;  
           //console.log(repeated);
         }         
@@ -970,7 +972,7 @@ class App extends Component {
 
     var newFace = await this.checkImage(rarity, final);
 
-    this.state.finish.push(newFace);
+    this.state.svg.push(newFace);
      
     const name = await this.getRandomName();
     //console.log(name);
@@ -984,7 +986,7 @@ class App extends Component {
         external_url : `${url}`,
         attributes: []
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 2){
       const meta = {
@@ -1001,7 +1003,7 @@ class App extends Component {
           }         
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
       
     } else if(this.state.number == 3){
       const meta = {
@@ -1022,7 +1024,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 4){
       const meta = {
@@ -1047,7 +1049,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 5){
       const meta = {
@@ -1076,7 +1078,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 6){
       const meta = {
@@ -1109,7 +1111,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 7){
       const meta = {
@@ -1146,7 +1148,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 8){
       const meta = {
@@ -1187,7 +1189,7 @@ class App extends Component {
           },
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 9){
       const meta = {
@@ -1231,7 +1233,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 10){
       const meta = {
@@ -1280,7 +1282,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
     };
 
     svgToPng(newFace, (imgData) => {
@@ -1295,26 +1297,17 @@ class App extends Component {
 
         png = canvas.toDataURL().toString();
         //this.setState({png});
-        this.state.png.push(png) ;
+        this.state.finish.push(png) ;
       };
 
       image.src = imgData;
       const result =image.src;
       this.setState({result});
-      
     }); 
-
-    if(idx < items && idx > 0){
-      //await this.downloadFile(`${idx}.svg`, final)
-      downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
-    }
-
-    if(idx < (items - 1)){
-      //downloadPNG(`${idx + 1}.png`, this.state.png)
-    }      
+  
   } 
 
-  async createPNG(idx, prefix, description, url, rarity, items) {
+async createPNG(idx, prefix, description, url, rarity, items) {
    
   const  imageFormat = {
     width: 250,
@@ -1340,6 +1333,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
 
@@ -1367,6 +1361,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
     } else if(this.state.number == 3){
@@ -1400,6 +1395,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
 
@@ -1441,6 +1437,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
     } else if(this.state.number == 5){
@@ -1488,6 +1485,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
     } else if(this.state.number == 6){
@@ -1542,6 +1540,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
     } else if(this.state.number == 7){
@@ -1603,6 +1602,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
     } else if(this.state.number == 8){
@@ -1671,6 +1671,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
     } else if(this.state.number == 9){
@@ -1746,6 +1747,7 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
 
     } else if(this.state.number == 10){
@@ -1828,26 +1830,23 @@ class App extends Component {
       png = canvas.toDataURL();
 
       const result = png;
+      this.state.finish.push(result);
       this.setState({result});
     };
-
-    //var newFace = await this.checkImage(rarity);
-
-    //this.state.finish.push(newFace);
      
     const name = await this.getRandomName();
     //console.log(name);
 
     if(this.state.number == 1){
       const meta = {
-      
+       
         name: `${prefix} #${idx}`,
         description: `${description} ${name.split('-').join(' ')}`,
         image : ``,
         external_url : `${url}`,
         attributes: []
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 2){
       const meta = {
@@ -1864,7 +1863,7 @@ class App extends Component {
           }         
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
       
     } else if(this.state.number == 3){
       const meta = {
@@ -1885,7 +1884,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 4){
       const meta = {
@@ -1910,7 +1909,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 5){
       const meta = {
@@ -1939,7 +1938,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 6){
       const meta = {
@@ -1972,7 +1971,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 7){
       const meta = {
@@ -2009,7 +2008,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 8){
       const meta = {
@@ -2050,7 +2049,7 @@ class App extends Component {
           },
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 9){
       const meta = {
@@ -2094,7 +2093,7 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
+      this.state.JSON.push(meta);
 
     } else if(this.state.number == 10){
       const meta = {
@@ -2143,40 +2142,43 @@ class App extends Component {
           }
         ]
       } 
-      this.setState({meta});
-    };
-
-
-    if(idx < items && idx > 0){
-      //await this.downloadFile(`${idx}.svg`, final)
-      downloadFile(`${idx}.json`, JSON.stringify(this.state.meta))
-    }
-
-    if(idx < (items - 1)){
-      downloadPNG(`${idx + 1}.png`, this.state.result)
-    }      
+      this.state.JSON.push(meta);
+    };    
   } 
 
   async downloadzipPNG() {
 
     var JSZip = require("jszip");
-    let jsZip = new JSZip();
-    let folder = jsZip.folder("images");
-    const png = this.state.png;
+    let zip = new JSZip();
 
-    for (var i = 0; i < this.state.finish.length; i++){
-      let baseString = getBase64String(this.state.png[i]);
-      console.log(baseString);
-      folder.file(`${i + 1}`.png, baseString, {base64 : true});
-      console.log(folder);
+    var img = zip.folder("Images");
 
+    for (var i = 1; i < (this.state.finish.length - 1); i++){
+      const imgData = await this.state.finish[i].replace('data:image/png;base64,','');
+      img.file(`${i}.png`, imgData, {base64: true });
     }
-    jsZip.generateAsync({type:"blob"}).then(function (content) {
-      content = URL.createObjectURL(content);
-      let name = `JSJeep.zip`;
-      downloadPNG(name, png); // already written above
-    });
 
+    zip.generateAsync({type:"blob"})
+    .then(function(content){
+      saveAs(content, "Images.zip");
+    });
+  }
+
+  async downloadzipJSON() {
+
+    var JSZip = require("jszip");
+    let zip = new JSZip();
+
+    var file = zip.folder("JSON");
+
+    for (var i = 1; i < (this.state.finish.length - 1); i++){
+      file.file(`${i}.json`, JSON.stringify(this.state.JSON[i]), {base64: false });
+    }
+
+    zip.generateAsync({type:"blob"})
+    .then(function(content){
+      saveAs(content, "JSON.zip");
+    });
   }
 
   async addFields(){
@@ -2366,6 +2368,7 @@ class App extends Component {
       layerName: [],
       itemsInput: [],
       finish: [],
+      svg: [],
       png: []
 
     }
@@ -2631,6 +2634,7 @@ class App extends Component {
                                 <form onSubmit={(e) => {
                                   e.preventDefault()
                                   this.downloadzipPNG();
+                                  this.downloadzipJSON();
                                   
                                 }}>
                                                                  

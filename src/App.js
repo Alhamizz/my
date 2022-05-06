@@ -268,7 +268,7 @@ class App extends Component {
         await this.createImage(idx, prefix, description, url, rarity, items);
         await timeout(500); //for 0.5 sec delay
         if ( idx < items && idx > 0){
-          if ( i === 0 || i === 2 ){
+          if ( i === 0 || i === 4 ){
             i = 1;
             row = document.createElement("tr");
             var cell = document.createElement("td");
@@ -295,7 +295,7 @@ class App extends Component {
         await timeout(500); //for 0.5 sec delay
 
         if ( idx < items && idx > 0){
-          if ( i === 0 || i === 4 ){
+          if ( i === 0 || i === 2 ){
             i = 1;
             row = document.createElement("tr");
             cell = document.createElement("td");
@@ -490,8 +490,8 @@ class App extends Component {
   async createPNG(idx, prefix, description, url, rarity, items) {
     
     const  imageFormat = {
-      width: 300,
-      height: 300 
+      width: 800,
+      height: 800 
     };
 
     var itemsName = [];

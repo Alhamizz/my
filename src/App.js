@@ -297,7 +297,7 @@ class App extends Component {
         await timeout(500); //for 0.5 sec delay
 
         if ( idx < items && idx > 0){
-          if ( i === 0 || i === 4 ){
+          if ( i === 0 || i === 2 ){
             i = 1;
             row = document.createElement("tr");
             cell = document.createElement("td");

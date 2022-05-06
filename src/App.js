@@ -255,8 +255,6 @@ class App extends Component {
     const imageType = await data0name.match(re);
     this.setState({imageType})
 
-    console.log(this.state.layer);
-
     var svg = [];
     this.setState({svg});
     var finish = [];
@@ -297,7 +295,7 @@ class App extends Component {
         await timeout(500); //for 0.5 sec delay
 
         if ( idx < items && idx > 0){
-          if ( i === 0 || i === 2 ){
+          if ( i === 0 || i === 4 ){
             i = 1;
             row = document.createElement("tr");
             cell = document.createElement("td");
@@ -335,7 +333,7 @@ class App extends Component {
         containerButton.appendChild(button);
         
       }
-    } while (idx >= 0);
+    } while (idx >= 0 && this.state.end === 0);
   }
 
   async randInt(max ) {
@@ -413,7 +411,7 @@ class App extends Component {
 
     let reachedEnd = false;
 
-    for (var i=0; i < 10; i++){
+    for (var i=0; i < rarityCombinations; i++){
       var newFace = await this.generateRandomImages();
 
       var repeated = 0;
@@ -492,55 +490,92 @@ class App extends Component {
   async createPNG(idx, prefix, description, url, rarity, items) {
     
     const  imageFormat = {
-      width: 800,
-      height: 800 
+      width: 300,
+      height: 300 
     };
+
     var itemsName = [];
+    var randomNumber = [];
 
     const  canvas = createCanvas(imageFormat.width, imageFormat.height);
     const  ctx = canvas.getContext("2d");
 
-    for(var i = 1; i < this.state.layer.length; i++){
-      const randomNumber = await this.randInt(this.state.layer[i].length);
-      console.log(randomNumber)
-      itemsName[i] = await this.state.layer[i][randomNumber].name.replace('.png','');
-      console.log(itemsName)
 
-      var blob = new Blob([await this.state.layer[i][randomNumber]]);
-      var bloburl  = window.URL.createObjectURL(blob);
+    var rarityCombinations = rarity * this.state.possibleCombinations;
 
-      const  layerImage = await loadImage(bloburl);
-      ctx.drawImage(layerImage,0,0,imageFormat.width,imageFormat.height);
-    }
-
-    var png = undefined;
-    png = canvas.toDataURL();
-
-    const result = png;
-    this.state.finish.push(result);
-
-    this.setState({result});
-      
-    const name = await this.getRandomName();
-    //console.log(name);
-
-    const attributes = [];
-
-    for(var j = 0; j < (this.state.layer.length - 1); j++){
-      attributes[j] = { 
-        trait_type: await this.state.layerName[(j+1)],
-        value: await itemsName[j+1]
+    for(var l = 0; l < rarityCombinations+1; l++){
+      if (l === rarityCombinations){
+        console.log('end');
+        this.state.end = 1;
+        console.log(this.state.end);
+        break;
       }
-    }
+      var repeated = 0;
 
-    const meta = {      
-      name: `${prefix} #${idx}`,
-      description: `${description} ${name.split('-').join(' ')}`,
-      image : ``,
-      external_url : `${url}`,
-      attributes: attributes
+      console.log('start')
+      for(var i = 0; i < (this.state.layer.length - 1); i++){
+        randomNumber[i] = await this.randInt(this.state.layer[i+1].length);
+        //console.log(randomNumber)
+      }
+
+      for(var k = 0; k < (this.state.takenImage.length - 1); k++){
+        console.log(randomNumber.join(''))
+        console.log(this.state.takenImage[k+1])
+        if(randomNumber.join('') === this.state.takenImage[k+1]){
+          repeated = repeated + 1;
+          console.log(repeated);
+        }
+      }
+
+      if (repeated < rarity){
+        this.state.takenImage.push(randomNumber.join(''));
+
+        for(var i = 0; i < (this.state.layer.length - 1); i++){
+          itemsName[i+1] = await this.state.layer[i+1][randomNumber[i]].name.replace('.png','');
+          //console.log(itemsName)
+    
+          var blob = new Blob([await this.state.layer[i+1][randomNumber[i]]]);
+          var bloburl  = window.URL.createObjectURL(blob);
+    
+          const  layerImage = await loadImage(bloburl);
+          ctx.drawImage(layerImage,0,0,imageFormat.width,imageFormat.height);
+        }
+
+        var png = undefined;
+        png = canvas.toDataURL();
+    
+        const result = png;
+        this.state.finish.push(result);
+    
+        this.setState({result});
+          
+        const name = await this.getRandomName();
+        //console.log(name);
+    
+        const attributes = [];
+    
+        for(var j = 0; j < (this.state.layer.length - 1); j++){
+          attributes[j] = { 
+            trait_type: await this.state.layerName[(j+1)],
+            value: await itemsName[j+1]
+          }
+        }
+    
+        const meta = {      
+          name: `${prefix} #${idx}`,
+          description: `${description} ${name.split('-').join(' ')}`,
+          image : ``,
+          external_url : `${url}`,
+          attributes: attributes
+        } 
+        this.state.JSON.push(meta);
+        break;  
+      } 
+      else {
+      console.log('repeat');
+      }
     } 
-    this.state.JSON.push(meta);
+
   }
 
   async downloadzipPNG() {
@@ -617,7 +652,7 @@ class App extends Component {
       var possibleCombinations = this.state.possibleCombinations;
       possibleCombinations = possibleCombinations * this.state.layer[number].length;
       this.setState({possibleCombinations});
-      console.log(possibleCombinations)
+      //console.log(possibleCombinations)
     }
  
     container.appendChild(document.createTextNode("Layer " + (number) + ":"));
@@ -672,7 +707,10 @@ class App extends Component {
       itemsInput: [],
       finish: [],
       svg: [],
-      png: []
+      png: [],
+
+      takenImage: [],
+      end: 0
 
     }
       this.addFields = this.addFields.bind(this);

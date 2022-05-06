@@ -96,3 +96,11 @@ input[type=number]:focus, input[type=text]:focus {
     transform: rotate(360deg);
   }
 }
+
+span {
+  content: "\2139";
+  color: 	#0000FF;
+  float: right;
+  font-size:20px;
+}
+

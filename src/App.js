@@ -503,11 +503,11 @@ class App extends Component {
 
     var rarityCombinations = rarity * this.state.possibleCombinations;
 
-    for(var l = 0; l < rarityCombinations+1; l++){
+    for(var l = 0; l < (rarityCombinations+1); l++){
       if (l === rarityCombinations){
         console.log('end');
         this.state.end = 1;
-        console.log(this.state.end);
+        console.log(this.state.finish.length);
         break;
       }
       var repeated = 0;
@@ -591,7 +591,7 @@ class App extends Component {
         img.file(`${i+1}.png`, imgData, {base64: true });
       }
     }else {
-      for (var j = 1; j < (this.state.finish.length - 1); j++){
+      for (var j = 1; j < (this.state.finish.length ); j++){
         const imgData = await this.state.finish[j].replace('data:image/png;base64,','');
         img.file(`${j}.png`, imgData, {base64: true });
       }
@@ -615,7 +615,7 @@ class App extends Component {
         file.file(`${i+1}.json`, JSON.stringify(this.state.JSON[i + 1]), {base64: false });
       }
     }else {
-      for (var j = 1; j < (this.state.finish.length - 1); j++){
+      for (var j = 1; j < (this.state.finish.length ); j++){
         file.file(`${j}.json`, JSON.stringify(this.state.JSON[j]), {base64: false });
       }
     }
@@ -624,6 +624,25 @@ class App extends Component {
     .then(function(content){
       saveAs(content, "JSON.zip");
     });
+  }
+
+  inputLayer = event => {
+    var number = this.state.number;
+    number = number + 1;
+    this.setState({number});
+    var layerItems = [];
+
+    for (var m = 0; m < event.target.files.length ; m++){
+      layerItems[m] = event.target.files[m];
+    }
+
+    this.state.layer[number] = layerItems;
+    console.log(this.state.layer)
+    
+    var possibleCombinations = this.state.possibleCombinations;
+    possibleCombinations = possibleCombinations * this.state.layer[number].length;
+    this.setState({possibleCombinations});
+    //console.log(possibleCombinations)
   }
 
   async addFields(){
@@ -739,7 +758,7 @@ class App extends Component {
                 <h1>Welcome to Dapps</h1>
                 <br></br>
                 <div className="row">
-                    <main role="main" className="d-flex justify-content-center mb-3 text-black">
+                    <main role="main" className="d-flex justify-content-center mb-3 text-black" >
                         <div className="content mr-auto ml-auto">
                           <Tabs defaultActiveKey="profile" id="uncontrolled-tab-example" >
 
@@ -884,9 +903,9 @@ class App extends Component {
                             </Tab>  
                             <Tab eventKey="NFT Factory" title="NFT Factory">
 
-                              <div>  
+                              <div >  
                                 <br></br> 
-                                <h5>Input Layers:</h5>  
+                                <h5 >Input Layers: </h5> 
 
                                 <label htmlFor="Background" style={{float: "center"}}>Background:</label>
                                       <input
@@ -895,7 +914,7 @@ class App extends Component {
                                         webkitdirectory="" 
                                         mozdirectory=""
                                         type='file'
-                                        onChange={this.inputBackground}                                       
+                                        onChange={this.inputLayer}                                       
                                         className="form-control form-control-md"/> 
 
                                 <br></br> 
@@ -922,7 +941,7 @@ class App extends Component {
 
                                   <label htmlFor="Name" style={{float: "left"}}>Name:</label> 
                                     <input
-                                      id='Name' 
+                                      id='Name'                                      
                                       type='text'
                                       ref={(input) => { this.Prefix = input }}
                                       className="form-control input-sm"
@@ -944,25 +963,30 @@ class App extends Component {
                                       className="form-control input-sm"
                                       placeholder='https://example.com'/> 
 
-                                  <label htmlFor="Rarity" style={{float: "left"}}>Rarity:</label>
+                                  <label htmlFor="Rarity" style={{float: "left"}}>Rarity: </label>
+
+                                  <span id="hoverText"title="Rarity must be between 1-100">&#8505;</span>
+
                                     <input
                                       id='Rarity'
                                       type='number'
                                       defaultValue='1'
                                       ref={(input) => { this.Rarity = input }}
                                       className="form-control input-sm"
-                                      placeholder='Rarity must be between 1-100'
                                       min ="1"
                                       max = "100"
                                       required/> 
 
-                                  <label htmlFor="Items" style={{float: "left"}}>Number of Items:</label>
+                                  <label htmlFor="Items" style={{float: "left"}}>Number of Items: </label>
+
+                                  <span id="hoverText" title="May not be more than possible combinations..">&#8505;</span>
+
                                     <input
                                       id='Items'
                                       type='number'
+                                      defaultValue='1'
                                       ref={(input) => { this.Item = input }}
                                       className="form-control input-sm"
-                                      placeholder='May not be more than possible combinations..'
                                       min ="1"
                                       max = {this.state.possibleCombinations}
                                       required/> 

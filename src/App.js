@@ -82,7 +82,7 @@ function svgUrlToPng(svgUrl, callback) {
     canvas.width = svgImage.clientWidth;
     canvas.height = svgImage.clientHeight;
     const canvasCtx = canvas.getContext('2d');
-    canvasCtx.drawImage(svgImage, 25, 25);
+    canvasCtx.drawImage(svgImage, 0, 0);
     const imgData = canvas.toDataURL('image/png');
     callback(imgData);
     document.body.removeChild(svgImage);
@@ -295,7 +295,7 @@ class App extends Component {
         await timeout(500); //for 0.5 sec delay
 
         if ( idx < items && idx > 0){
-          if ( i === 0 || i === 2 ){
+          if ( i === 0 || i === 4 ){
             i = 1;
             row = document.createElement("tr");
             cell = document.createElement("td");
@@ -317,7 +317,8 @@ class App extends Component {
           } 
         }     
       }   
-      idx--;
+      idx--
+      this.setState({idx});
 
       if(idx == 0){
         var containerButton = document.getElementById("containerButton");
@@ -374,86 +375,82 @@ class App extends Component {
   
       return final;
   }
-  
-  async generateRandomImages() {
-    var layerImage = [null];
-    var itemsName = [];
 
-    for(var i = 0; i < (this.state.layer.length - 1); i++){
-      const randomNumber = await this.randInt(this.state.layer[i + 1].length);
-      console.log(randomNumber)
-      itemsName[i + 1] = await this.state.layer[i + 1][randomNumber].name.replace('.svg','');
-      this.setState({itemsName})
+  async checkImage(rarity){ 
 
-      const data0 = await this.state.layer[i+1][randomNumber]; 
-
-      const reader = new FileReader();
-      reader.readAsText(data0);
-      reader.onload = (e) => {
-        const svg = reader.result;
-        const re = /(?<=\<svg\s*[^>]*>)([\s\S]*?)(?=\<\/svg\>)/g
-        const layerResult = svg.match(re)[0];
-        layerImage.push(layerResult);
-        const final = this.combineImage(layerImage);
-        this.setState({final});
-      };     
-    }
-    
-    return this.state.final;
-  }
-
-  async checkImage(rarity){
-  
-    //var possibleCombinations = rarity * (this.state.head.length * this.state.eyes.length /* this.state.nose.length  * this.state.mouth.length  * this.state.hair.length * this.state.beard.length*/);
-    // 9600 combinations
-  
     var rarityCombinations = rarity * this.state.possibleCombinations;
+    var layerImage = [];
+    var itemsName = [];  
+    var randomNumber = [];
+    console.log(await this.state.idx)
 
-    let reachedEnd = false;
-
-    for (var i=0; i < rarityCombinations; i++){
-      var newFace = await this.generateRandomImages();
-
+    for(var l = 0; l < (rarityCombinations+5); l++){
+      if (l === rarityCombinations){
+        console.log('No more possible combinations');
+        this.state.end = 1;
+        console.log(this.state.finish.length);
+        break;
+      }
       var repeated = 0;
 
-      for (var j = 0; j < this.state.svg.length ; j++){
-        console.log(j);
-        console.log(this.state.svg.length);
-        //console.log(this.state.svg[j]);
-        //console.log(await newFace);
-
-        if (this.state.svg[j] == await newFace){
-          repeated++;  
-          //console.log("Repeat");
-        }         
-      }         
-      if(repeated < rarity){
-        reachedEnd = false;
-        //console.log('Continue');
-        return newFace;   
+      console.log('start')
+      for(var i = 0; i < (this.state.layer.length - 1); i++){
+        randomNumber[i] = await this.randInt(this.state.layer[i + 1].length);
+        if (i != 0){
+          itemsName[i + 1] = await this.state.layer[i + 1][randomNumber[i]].name.replace('.svg','');
+        }
       }
-      if(reachedEnd == true){
-        //console.log('No more possible combination');
+
+      for(var k = 0; k < (this.state.takenImage.length ); k++){
+        console.log(randomNumber.join(''))
+        console.log(await this.state.takenImage[k])
+        if(randomNumber.join('') === await this.state.takenImage[k]){
+          repeated = repeated + 1;
+          console.log(repeated);
+        }
+      }
+
+      if (repeated < rarity){
+        this.setState({itemsName})
+
+        for(var i = 0; i < (this.state.layer.length - 1); i++){
+          const data0 = await this.state.layer[i+1][randomNumber[i]]; 
+          const reader = new FileReader();
+          reader.readAsText(data0);
+          reader.onload = (e) => {
+            const svg = reader.result;
+            const re = /(?<=\<svg\s*[^>]*>)([\s\S]*?)(?=\<\/svg\>)/g
+            const layerResult = svg.match(re)[0];
+            layerImage.push(layerResult);
+            const final = this.combineImage(layerImage);
+            this.setState({final});
+          }
+        }
+        this.state.takenImage.push(randomNumber.join(''));
+        console.log('end');
+
+        break;
+      
       } 
-      //console.log('end'); 
+      else {
+      console.log('repeat');
+      }
     } 
   }
 
   async createImage(idx, prefix, description, url, rarity, items) {
 
-    var newFace = await this.generateRandomImages();
-
-    this.state.svg.push(newFace);
+    await this.checkImage(rarity);
      
     const name = await this.getRandomName();
     //console.log(name);
 
     const attributes = [];
 
-    for(var i = 0; i < (this.state.layer.length - 1); i++){
+    for(var i = 0; i < (this.state.layer.length - 2); i++){
       attributes[i] = { 
-        trait_type: await this.state.layerName[(i+1)],
-        value: await this.state.itemsName[i+1]
+        trait_type: await this.state.layerName[(i+2)],
+        value: await this.state.itemsName[i+2]
       }
     }
 
@@ -466,18 +463,17 @@ class App extends Component {
     } 
     this.state.JSON.push(meta);
 
-    svgToPng(newFace, (imgData) => {
+    svgToPng(await this.state.final, (imgData) => {
       let image = new Image();
       image.onload = () => {
             
-        let canvas = document.createElement('canvas');
+        let canvas = createCanvas(300, 300);
         let context = canvas.getContext('2d');
 
-        context.drawImage(image, 0, 0, 150, 150);
+        context.drawImage(image, 0, 0, 300 ,300);
         var png = [];
 
-        png = canvas.toDataURL().toString();
-        //this.setState({png});
+        png = canvas.toDataURL();
         this.state.finish.push(png) ;
       };
 
@@ -489,19 +485,11 @@ class App extends Component {
 
   async createPNG(idx, prefix, description, url, rarity, items) {
     
-    const  imageFormat = {
-      width: 800,
-      height: 800 
-    };
-
     var itemsName = [];
     var randomNumber = [];
 
-    const  canvas = createCanvas(imageFormat.width, imageFormat.height);
-    const  ctx = canvas.getContext("2d");
-
-
     var rarityCombinations = rarity * this.state.possibleCombinations;
+    this.setState({rarityCombinations})
 
     for(var l = 0; l < (rarityCombinations+1); l++){
       if (l === rarityCombinations){
@@ -529,6 +517,12 @@ class App extends Component {
 
       if (repeated < rarity){
         this.state.takenImage.push(randomNumber.join(''));
+   
+        const  canvas0 = createCanvas(800, 800);
+        const  ctx0 = canvas0.getContext("2d");
+
+        const  canvas1 = createCanvas(300, 300);
+        const  ctx1 = canvas1.getContext("2d");
 
         for(var i = 0; i < (this.state.layer.length - 1); i++){
           itemsName[i+1] = await this.state.layer[i+1][randomNumber[i]].name.replace('.png','');
@@ -538,15 +532,23 @@ class App extends Component {
           var bloburl  = window.URL.createObjectURL(blob);
     
           const  layerImage = await loadImage(bloburl);
-          ctx.drawImage(layerImage,0,0,imageFormat.width,imageFormat.height);
+          ctx0.drawImage(layerImage,0,0,800,800);
+        }
+        this.state.finish.push(canvas0.toDataURL());
+
+    
+        for(var i = 0; i < (this.state.layer.length - 1); i++){
+          itemsName[i+1] = await this.state.layer[i+1][randomNumber[i]].name.replace('.png','');
+          //console.log(itemsName)
+    
+          var blob = new Blob([await this.state.layer[i+1][randomNumber[i]]]);
+          var bloburl  = window.URL.createObjectURL(blob);
+    
+          const  layerImage = await loadImage(bloburl);
+          ctx1.drawImage(layerImage,0,0,300,300);
         }
 
-        var png = undefined;
-        png = canvas.toDataURL();
-    
-        const result = png;
-        this.state.finish.push(result);
-    
+        var result = canvas1.toDataURL();
         this.setState({result});
           
         const name = await this.getRandomName();
@@ -554,10 +556,10 @@ class App extends Component {
     
         const attributes = [];
     
-        for(var j = 0; j < (this.state.layer.length - 1); j++){
+        for(var j = 0; j < (this.state.layer.length - 2); j++){
           attributes[j] = { 
-            trait_type: await this.state.layerName[(j+1)],
-            value: await itemsName[j+1]
+            trait_type: await this.state.layerName[(j+2)],
+            value: await itemsName[j+2]
           }
         }
     
@@ -575,7 +577,6 @@ class App extends Component {
       console.log('repeat');
       }
     } 
-
   }
 
   async downloadzipPNG() {
@@ -586,12 +587,12 @@ class App extends Component {
     var img = zip.folder("Images");
 
     if(this.state.imageType == 'svg'){
-      for (var i = 0; i < (this.state.finish.length -1); i++){
+      for (var i = 0; i < (this.state.finish.length); i++){
         const imgData = await this.state.finish[i].replace('data:image/png;base64,','');
         img.file(`${i+1}.png`, imgData, {base64: true });
       }
     }else {
-      for (var j = 1; j < (this.state.finish.length ); j++){
+      for (var j = 1; j < (this.state.finish.length -1); j++){
         const imgData = await this.state.finish[j].replace('data:image/png;base64,','');
         img.file(`${j}.png`, imgData, {base64: true });
       }
@@ -611,11 +612,11 @@ class App extends Component {
     var file = zip.folder("JSON");
 
     if(this.state.imageType == 'svg'){
-      for (var i = 0; i < (this.state.finish.length -1); i++){
+      for (var i = 0; i < (this.state.finish.length ); i++){
         file.file(`${i+1}.json`, JSON.stringify(this.state.JSON[i + 1]), {base64: false });
       }
     }else {
-      for (var j = 1; j < (this.state.finish.length ); j++){
+      for (var j = 1; j < (this.state.finish.length -1); j++){
         file.file(`${j}.json`, JSON.stringify(this.state.JSON[j]), {base64: false });
       }
     }
@@ -673,8 +674,28 @@ class App extends Component {
       this.setState({possibleCombinations});
       //console.log(possibleCombinations)
     }
+
+    const fillDetails = () => {
+      var numbera = this.state.layer[number].length;
+
+      for (var i = 0; i <numbera; i++){
  
-    container.appendChild(document.createTextNode("Layer " + (number) + ":"));
+        container.appendChild(document.createTextNode("Item " + (i+1) + ": "));   
+  
+        var input2 = document.createElement("input");
+  
+        input2.id = 'Layer' + i;
+        input2.name = 'layer' + i;
+        input2.type = 'file';
+        input2.type = 'text';
+        input2.placeholder = 'Item rarity..'
+  
+        container.appendChild(input2);  
+        container.appendChild(document.createElement("br"));   
+      }
+    }
+
+    container.appendChild(document.createTextNode("Layer " + (number - 1) + ":"));
 
     var input0 = document.createElement("input");
 
@@ -682,8 +703,8 @@ class App extends Component {
     input0.name = 'layer' + number;
     input0.type = 'text';
     input0.placeholder = 'Enter Layer Name..'
-    input0.className = "form-control form-control-md"; 
     input0.onchange = inputLayerName;
+    input0.setAttribute("required", "");
 
     container.appendChild(input0);     
 
@@ -694,10 +715,20 @@ class App extends Component {
     input1.type = 'file';
     input1.multiple ='multiple';
     input1.webkitdirectory = 'webkitdirectory';
-    input1.className = "form-control form-control-file"; 
     input1.onchange = inputLayer;
 
-    container.appendChild(input1);  
+    container.appendChild(input1); 
+    container.appendChild(document.createElement("br"));   
+
+    var details = document.createElement("a");
+
+    details.href = "#";
+    details.text = "Fill Details";
+    details.id = "filldetails";
+    details.onclick = fillDetails;
+
+    container.appendChild(details); 
+
     container.appendChild(document.createElement("br"));   
   }
 
@@ -988,7 +1019,7 @@ class App extends Component {
                                       ref={(input) => { this.Item = input }}
                                       className="form-control input-sm"
                                       min ="1"
-                                      max = {this.state.possibleCombinations}
+                                      max = {this.state.rarityCombinations}
                                       required/> 
                               
                                 <br></br>

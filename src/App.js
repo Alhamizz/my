@@ -265,7 +265,7 @@ class App extends Component {
     do {
 
       if(imageType == 'svg'){
-        await this.createImage(idx, prefix, description, url, rarity, items);
+        await this.createImage(this.state.idx, prefix, description, url, rarity, items);
         await timeout(500); //for 0.5 sec delay
         if ( idx < items && idx > 0){
           if ( i === 0 || i === 4 ){
@@ -291,7 +291,7 @@ class App extends Component {
         }
       } else {
 
-        await this.createPNG(idx, prefix, description, url, rarity, items);
+        await this.createPNG(this.state.idx, prefix, description, url, rarity, items);
         await timeout(500); //for 0.5 sec delay
 
         if ( idx < items && idx > 0){
@@ -317,8 +317,7 @@ class App extends Component {
           } 
         }     
       }   
-      idx--
-      this.setState({idx});
+      idx--;
 
       if(idx == 0){
         var containerButton = document.getElementById("containerButton");
@@ -326,14 +325,16 @@ class App extends Component {
         var button = document.createElement("button");
         button.innerHTML = 'Download'
         button.className='btn btn-primary'
+        idx--;
 
         button.onclick = function (){
           this.downloadzipJSON();
           this.downloadzipPNG();
       }.bind(this);
         containerButton.appendChild(button);
-        
-      }
+
+    }
+
     } while (idx >= 0 && this.state.end === 0);
   }
 
@@ -485,38 +486,57 @@ class App extends Component {
 
   async createPNG(idx, prefix, description, url, rarity, items) {
     
-    var itemsName = [];
-    var randomNumber = [];
 
-    var rarityCombinations = rarity * this.state.possibleCombinations;
-    this.setState({rarityCombinations})
-
-    for(var l = 0; l < (rarityCombinations+1); l++){
-      if (l === rarityCombinations){
+    for(var l = 0; l < 10001; l++){
+      if (l == 10000){
         console.log('end');
         this.state.end = 1;
-        console.log(this.state.finish.length);
+        this.state.idx = 0;
         break;
       }
       var repeated = 0;
+      var repeated1 = 0;
+      var stop = false;
+      var itemsName = [];
+      var randomNumber = [];
 
       console.log('start')
       for(var i = 0; i < (this.state.layer.length - 1); i++){
         randomNumber[i] = await this.randInt(this.state.layer[i+1].length);
-        //console.log(randomNumber)
+        console.log(randomNumber)
       }
 
       for(var k = 0; k < (this.state.takenImage.length - 1); k++){
-        console.log(randomNumber.join(''))
-        console.log(this.state.takenImage[k+1])
-        if(randomNumber.join('') === this.state.takenImage[k+1]){
+        if(randomNumber.toString() === this.state.takenImage[k+1].toString()){
           repeated = repeated + 1;
-          console.log(repeated);
+          //console.log(repeated);
         }
       }
 
-      if (repeated < rarity){
-        this.state.takenImage.push(randomNumber.join(''));
+      for(var n = 0; n < (this.state.layer.length - 1) && !stop; n++){
+        for ( var m = 0; m < randomNumber.length; m++){
+          //console.log(this.state.takenImage[n][m])
+          //console.log(randomNumber[m])
+          if (this.state.layer[n+1][m].rarity != 0){
+            for (var o = 0; o < (this.state.takenImage.length - 1); o++){
+              if (randomNumber[m] == await this.state.takenImage[o+1][m]){
+                repeated1 = repeated1 + 1;              
+                //console.log(repeated1);
+              }
+            }
+            if (repeated1 >= this.state.layer[n+1][m].rarity){
+              stop = true;
+              console.log('item repeat')
+              break;
+            }
+          } 
+        }
+      }
+
+      console.log(stop)
+      if (repeated < rarity && !stop){
+        this.state.takenImage.push(randomNumber);
+        console.log('print')
    
         const  canvas0 = createCanvas(800, 800);
         const  ctx0 = canvas0.getContext("2d");
@@ -524,7 +544,7 @@ class App extends Component {
         const  canvas1 = createCanvas(300, 300);
         const  ctx1 = canvas1.getContext("2d");
 
-        for(var i = 0; i < (this.state.layer.length - 1); i++){
+        for (i = 0; i < (this.state.layer.length - 1); i++){
           itemsName[i+1] = await this.state.layer[i+1][randomNumber[i]].name.replace('.png','');
           //console.log(itemsName)
     
@@ -537,14 +557,14 @@ class App extends Component {
         this.state.finish.push(canvas0.toDataURL());
 
     
-        for(var i = 0; i < (this.state.layer.length - 1); i++){
+        for(i = 0; i < (this.state.layer.length - 1); i++){
           itemsName[i+1] = await this.state.layer[i+1][randomNumber[i]].name.replace('.png','');
           //console.log(itemsName)
     
-          var blob = new Blob([await this.state.layer[i+1][randomNumber[i]]]);
-          var bloburl  = window.URL.createObjectURL(blob);
+          var blob1 = new Blob([await this.state.layer[i+1][randomNumber[i]]]);
+          var bloburl1  = window.URL.createObjectURL(blob1);
     
-          const  layerImage = await loadImage(bloburl);
+          const  layerImage = await loadImage(bloburl1);
           ctx1.drawImage(layerImage,0,0,300,300);
         }
 
@@ -571,6 +591,7 @@ class App extends Component {
           attributes: attributes
         } 
         this.state.JSON.push(meta);
+        
         break;  
       } 
       else {
@@ -592,7 +613,7 @@ class App extends Component {
         img.file(`${i+1}.png`, imgData, {base64: true });
       }
     }else {
-      for (var j = 1; j < (this.state.finish.length -1); j++){
+      for (var j = 1; j < (this.state.finish.length ); j++){
         const imgData = await this.state.finish[j].replace('data:image/png;base64,','');
         img.file(`${j}.png`, imgData, {base64: true });
       }
@@ -616,7 +637,7 @@ class App extends Component {
         file.file(`${i+1}.json`, JSON.stringify(this.state.JSON[i + 1]), {base64: false });
       }
     }else {
-      for (var j = 1; j < (this.state.finish.length -1); j++){
+      for (var j = 1; j < (this.state.finish.length ); j++){
         file.file(`${j}.json`, JSON.stringify(this.state.JSON[j]), {base64: false });
       }
     }
@@ -635,15 +656,61 @@ class App extends Component {
 
     for (var m = 0; m < event.target.files.length ; m++){
       layerItems[m] = event.target.files[m];
+      this.state.layer[number] = layerItems;
+      this.state.layer[number][m]["rarity"] = '0';
     }
 
-    this.state.layer[number] = layerItems;
     console.log(this.state.layer)
     
     var possibleCombinations = this.state.possibleCombinations;
     possibleCombinations = possibleCombinations * this.state.layer[number].length;
     this.setState({possibleCombinations});
-    //console.log(possibleCombinations)
+    var rarityCombinations = this.state.rarity * possibleCombinations;
+    this.setState({rarityCombinations})
+  }
+
+  fillDetails = () => {
+
+    var container = document.getElementById("containera");
+    
+    if (this.state.click === 0){
+      for (var i = 0; i <this.state.layer[this.state.number].length; i++){
+
+        container.appendChild(document.createTextNode("Item " + (i+1) + ": "));   
+  
+        var input2 = document.createElement("input");
+  
+        input2.id = 'Item' + i;
+        input2.name = 'item' + i;
+        input2.type = 'number';
+        input2.defaultValue = this.state.layer[this.state.number][i].rarity;
+        input2.onchange = this.itemRarity;
+  
+        container.appendChild(input2);  
+        container.appendChild(document.createElement("br"));  
+        this.state.click++; 
+      }
+
+    } else {
+      for (var j = 0; j <(+this.state.layer[this.state.number].length * 3); j++){
+        container.removeChild(container.lastChild);
+      }
+      console.log(this.state.layer[this.state.number].length * 3)
+      this.state.click = 0;
+    }
+
+  }
+
+  itemRarity = event => {
+    var itemRarity = 0;;
+
+    for (var i = 0; i <this.state.layer[this.state.number].length; i++){
+      if(document.getElementById(`Item${i}`).value == event.target.value){
+          itemRarity = event.target.value;
+          this.state.layer[this.state.number][i]["rarity"] = itemRarity;
+          console.log(this.state.layer)
+      }
+    }
   }
 
   async addFields(){
@@ -651,6 +718,7 @@ class App extends Component {
     //console.log(number);
     number = number + 1;
     this.setState({number});
+    var click = 0;
 
     var container = document.getElementById("container");
     
@@ -664,38 +732,60 @@ class App extends Component {
 
       for (var m = 0; m < event.target.files.length ; m++){
         layerItems[m] = event.target.files[m];
+        this.state.layer[number] = layerItems;
+        this.state.layer[number][m]["rarity"] = '0';
       }
-
-      this.state.layer[number] = layerItems;
       console.log(this.state.layer)
       
       var possibleCombinations = this.state.possibleCombinations;
       possibleCombinations = possibleCombinations * this.state.layer[number].length;
       this.setState({possibleCombinations});
-      //console.log(possibleCombinations)
+      var rarityCombinations = this.state.rarity * possibleCombinations;
+      this.setState({rarityCombinations})
     }
 
     const fillDetails = () => {
-      var numbera = this.state.layer[number].length;
-
-      for (var i = 0; i <numbera; i++){
+      if (click === 0){
+        for (var i = 0; i <this.state.layer[number].length; i++){
  
-        container.appendChild(document.createTextNode("Item " + (i+1) + ": "));   
-  
-        var input2 = document.createElement("input");
-  
-        input2.id = 'Layer' + i;
-        input2.name = 'layer' + i;
-        input2.type = 'file';
-        input2.type = 'text';
-        input2.placeholder = 'Item rarity..'
-  
-        container.appendChild(input2);  
-        container.appendChild(document.createElement("br"));   
+          container.appendChild(document.createTextNode("Item " + (i+1) + ": "));   
+    
+          var input2 = document.createElement("input");
+    
+          input2.id = 'Item' + i;
+          input2.name = 'item' + i;
+          input2.type = 'number';
+          input2.defaultValue = this.state.layer[number][i].rarity;
+          input2.onchange = itemRarity;
+    
+          container.appendChild(input2);  
+          container.appendChild(document.createElement("br"));  
+          click++; 
+        }
+
+      } else {
+        for (var j = 0; j <(+this.state.layer[number].length * 3); j++){
+          container.removeChild(container.lastChild);
+        }
+        console.log(this.state.layer[number].length * 3)
+        click = 0;
       }
+
     }
 
-    container.appendChild(document.createTextNode("Layer " + (number - 1) + ":"));
+    const itemRarity = event => {
+      var itemRarity = 0;;
+
+      for (var i = 0; i <this.state.layer[number].length; i++){
+        if(document.getElementById(`Item${i}`).value == event.target.value){
+            itemRarity = event.target.value;
+            this.state.layer[number][i]["rarity"] = itemRarity;          
+        }
+      }
+      console.log(this.state.layer)
+    }
+
+    container.appendChild(document.createTextNode("Layer " + (number - 1) + " : "));
 
     var input0 = document.createElement("input");
 
@@ -723,13 +813,17 @@ class App extends Component {
     var details = document.createElement("a");
 
     details.href = "#";
-    details.text = "Fill Details";
+    details.text = "Fill item rarity..";
     details.id = "filldetails";
     details.onclick = fillDetails;
 
     container.appendChild(details); 
 
     container.appendChild(document.createElement("br"));   
+  }
+
+  rarityChange = event => {
+    this.state.rarity = event.target.value;
   }
 
 
@@ -749,6 +843,7 @@ class App extends Component {
       description: 'undefined',
 
       number : 0,
+      rarity : 1,
       possibleCombinations: 1,
 
       layerName: [],
@@ -760,7 +855,8 @@ class App extends Component {
       png: [],
 
       takenImage: [],
-      end: 0
+      end: 0,
+      click: 0
 
     }
       this.addFields = this.addFields.bind(this);
@@ -938,17 +1034,22 @@ class App extends Component {
                                 <br></br> 
                                 <h5 >Input Layers: </h5> 
 
-                                <label htmlFor="Background" style={{float: "center"}}>Background:</label>
+                                <label htmlFor="Background" style={{float: "center"}}>Background : </label>
+                                <br></br> 
                                       <input
                                         id='Background' 
                                         multiple directory="" 
                                         webkitdirectory="" 
                                         mozdirectory=""
                                         type='file'
-                                        onChange={this.inputLayer}                                       
-                                        className="form-control form-control-md"/> 
+                                        onChange={this.inputLayer}/> 
 
                                 <br></br> 
+                                
+                                <label id = "filldetails" onClick={this.fillDetails} style={{color:"rgb(22, 84, 218)"}}><u>Fill item Rarity..</u></label>
+                                <div id="containera"/>
+                                <br></br> 
+
                                 <div id="container"/>
                                 <button id="addFields" onClick={this.addFields} className='btn btn-primary'>Add Layer</button> 
 
@@ -962,6 +1063,7 @@ class App extends Component {
                                   let url = this.Url.value;
                                   let rarity = this.Rarity.value;
                                   let item = this.Item.value;
+                                  this.state.rarity = rarity;
 
                                   let items = +item + 1;
 
@@ -1006,6 +1108,7 @@ class App extends Component {
                                       className="form-control input-sm"
                                       min ="1"
                                       max = "100"
+                                      onChange={this.rarityChange}
                                       required/> 
 
                                   <label htmlFor="Items" style={{float: "left"}}>Number of Items: </label>
@@ -1020,6 +1123,7 @@ class App extends Component {
                                       className="form-control input-sm"
                                       min ="1"
                                       max = {this.state.rarityCombinations}
+                                      onChange={this.itemsChange}
                                       required/> 
                               
                                 <br></br>
